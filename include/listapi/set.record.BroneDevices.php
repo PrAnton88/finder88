@@ -83,6 +83,7 @@ try{
 		throw new ErrorException("Данные о бронируемых устройствах не были переданы");
 		exit;
 	}
+	
 
 	if($nRecord === false){
 		/* новая заявка */

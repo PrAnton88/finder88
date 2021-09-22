@@ -49,7 +49,7 @@ try{
 		// $smarty->assign("messages",$resultTimeBusy);
 
 		// print_r($smarty);
-		return $smarty->display('formBronDevices.tpl');
+		return $smarty->display('formBroneDevices.tpl');
 		
 	
 
