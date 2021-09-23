@@ -94,8 +94,9 @@ class DB
 		$result = $this->query($query,$ajaxUid);
 		
 		//echo is_string($result)." \n";
-		if(!$result || mysqli_affected_rows($this->connection)<1) return $res;
 		if((is_string($result)) and (strpos($result,"error") !== false)) return $result;
+		if(!$result || mysqli_affected_rows($this->connection)<1) return $res;
+		
 		
 		while($row = mysqli_fetch_assoc($result)){
 			$res[] = $row;
@@ -107,8 +108,8 @@ class DB
 	function fetchFirst($query,$ajaxUid=false)
 	{
 		$result = $this->query($query,$ajaxUid);
-		if(!$result || mysqli_affected_rows($this->connection)<1) {return array();}
 		if((is_string($result)) and (strpos($result,"error") !== false)) return $result;
+		if(!$result || mysqli_affected_rows($this->connection)<1) {return array();}
 		
 		$row = mysqli_fetch_assoc($result);
 		return $row;
