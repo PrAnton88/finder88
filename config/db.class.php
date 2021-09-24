@@ -214,6 +214,52 @@ class DB
 		return mysqli_insert_id($this->connection);
 	}
 	
+	function updateTest($table_name, $iparams, $sparams = array(), $cond = "")
+	{
+		/*Если обращаемся к базе через точку, то имя База.Таблица должно быть не в кавычках а если просто Таблица, то вопрос - обязательно ли в кавычках, как `Таблица`*/
+		$expl = explode(".",$table_name);
+		
+		//echo "<br />";
+		//print_r($expl);
+		//echo "<br />".count($expl);
+		if(count($expl)==1){
+			$table_name = "`$table_name`";
+		}
+		
+		$query = "update $table_name set ";
+		
+		$names_vals = array();
+		foreach($iparams as $key=>$value){
+			$names_vals[] = "`$key`"."=".$value;
+		}
+		foreach($sparams as $key=>$value){
+			$names_vals[] = "`$key`"."="."'".addslashes($value)."'";
+		}
+		$query .= join(",",$names_vals);
+		if($cond){
+			$query .= ", id = (SELECT @update_id := id)";
+			$query .= " where $cond";
+			
+			// return "SET @update_id = NULL; ".$query."; SELECT @update_id;";
+		}
+		
+		$res = array();
+		
+		// $result = $this->query("SET @update_id = NULL; ".$query."; SELECT @update_id;");
+		$result = $this->query($query);
+		
+		// if(!$result || mysqli_affected_rows($this->connection)<1) return array('pipi'=>2);
+		
+		
+		while($row = mysqli_fetch_assoc($result)){
+			$res[] = $row;
+		}
+
+		return $res;
+		
+		
+	}
+	
 	function update($table_name, $iparams, $sparams = array(), $cond = "")
 	{
 		/*Если обращаемся к базе через точку, то имя База.Таблица должно быть не в кавычках а если просто Таблица, то вопрос - обязательно ли в кавычках, как `Таблица`*/
@@ -228,7 +274,6 @@ class DB
 		
 		$query = "update $table_name set ";
 		
-		
 		$names_vals = array();
 		foreach($iparams as $key=>$value){
 			$names_vals[] = "`$key`"."=".$value;
@@ -237,8 +282,11 @@ class DB
 			$names_vals[] = "`$key`"."="."'".addslashes($value)."'";
 		}
 		$query .= join(",",$names_vals);
-		if($cond){$query .= " where $cond";}
-		$this->query($query);
+		if($cond){
+			$query .= " where $cond";
+		}
+		
+		return $this->query($query,true,true);
 	}
 	
 	function update1($table_name, $sparams = array(), $cond = "")

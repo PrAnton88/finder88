@@ -12,8 +12,8 @@ try{
 		
 		/* b.free: 0 - не выдали, 2 - выдали, 1 - вернули */
 		/*выбрать все заявки на командировочное оборудование, где есть хотя бы одно устройство которое не вернули*/
-		$query = "SELECT a.id, a.userid as userId, a.listdevice,
-	 b.datest, b.dateend, b.free, 
+		$query = "SELECT a.id, a.userid as userId, a.listdevice as sdevices,
+	 b.datest, b.dateend, 
 	 c.id as 'nnote', c.note,
 	 concat_ws(' ', f.last_name, f.first_name, f.patronymic) as 'fio'
 	FROM
@@ -24,7 +24,6 @@ try{
 		WHERE (b.free = 0 OR b.free = 2)
 		GROUP BY a.id ORDER BY b.datest,b.dateend";
 		
-			
 		$result=$db->fetchAssoc($query,true);
 		
 		

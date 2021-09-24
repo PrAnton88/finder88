@@ -45,7 +45,6 @@ try{
 		
 		$listRecordsBusy = $result;
 		
-		
 		$arrDate = array();
 		$queryGetType = "SELECT t.id, t.type as name
 		FROM bronedevicetype as t 
@@ -143,9 +142,6 @@ try{
 				throw new ErrorException("Данные о местоположении ".$record["fio"]." не найдены ");
 			}
 		}
-		/*
-		print_r($listRecordsBusy);
-		*/
 		
 		$smarty->assign("admin",($user['priority'] == 3));
 		$smarty->assign("user",$user);
