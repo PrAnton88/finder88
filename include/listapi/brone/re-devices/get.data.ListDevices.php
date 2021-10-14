@@ -35,14 +35,19 @@ try{
 		}
 	}
 	
-	
 	/* свободные для бронирования устройства */
 	/* тут count - это количество свободных устройств, или свободных устройств + $editRecord */
 	/* .free = 2 это затребованные, = 0 это выданные */
 	
 	require_once $path."lib/query/get.query.ListDevices.php";
-	$query = getQueryToCheckFreeCountListDevice($type,$editRecord);
 	
+	
+	
+	if(isset($_POST['checkBusy'])){
+		$query = getQueryToCheckBusyDevices($type);
+	}else{
+		$query = getQueryToCheckFreeCountListDevice($type,$editRecord);
+	}
 	
 	
 	if(!isset($getImport)){
