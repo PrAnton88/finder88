@@ -81,6 +81,25 @@ try{
 			}
 			*/
 			
+			
+			
+			/* нужно взять информацию о правах авторизованного пользователя */
+			require_once "lib/query/get.query.UserLaws.php";
+			$queryLawsThisUser = getQueryToGetUserLaws("l.adminConversation,l.dispatchConversation");
+			$queryLawsThisUser .= " WHERE u.role = ".$uid;
+
+			$dataLaw = $db->fetchFirst($queryLawsThisUser,$uid);
+			if(is_string($dataLaw) && (strpos($dataLaw,'error')!== false)){
+				throw new ErrorException('SQL Error ');
+			}
+			
+			/* $smarty->assign("dataLaw",json_encode($dataLaw)); */
+			$smarty->assign("dataLaw",$dataLaw);
+			
+			
+			
+			
+			
 			$smarty->assign("messages",$resultConversation);
 
 			// print_r($smarty);

@@ -1,6 +1,6 @@
 <?php
 
-	define('MODX_CORE_PATH', 'C:/Users/oto016/singleProjects/modx-info/core/');
+	define('MODX_CORE_PATH', 'C:/www/info.neftehim.local/Portal.modx/core/');
 	define('MODX_CONFIG_KEY', 'config');
 	
 	if (!@include_once (MODX_CORE_PATH . "model/modx/modx.class.php")) {

@@ -40,7 +40,7 @@
 		
 		$resp .= ', line '. $ex->getLine() .': ';
 		
-		$resp .= str_replace("\t"," ",str_replace("\n"," ",str_replace('\\','/',$ex->getMessage() ) ) );
+		$resp .= str_replace("\t"," ",str_replace("\r\n"," ",str_replace("\n"," ",str_replace('\\','/',$ex->getMessage() ) ) ) );
 		
 		return $resp;
 	}

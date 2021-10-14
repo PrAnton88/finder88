@@ -16,13 +16,19 @@
 		}
 		*/
 		
+		$spath = '';
+		if(isset($path)){
+			$spath = $path;
+		}
+		
 		$resolution = true;
 		$user = array();
 		
-		define('PATH','../../');
+		define('PATH',$spath.'../../');
 		
 		
 		require_once("error.reporting.php");
+		require_once("queryUserData.php");
 		
 		// trigger_error("This event WILL fire", E_WARNING);
 		// trigger_error("This event WILL fire", E_USER_NOTICE);
@@ -64,6 +70,7 @@
 				}else{
 					
 					$user = getUserData($db,$uid,"r.id=$uid");
+					
 					if((is_string($user)) && (strpos($user,"error") !== false)){
 						$user = array();
 						// header("HTTP/1.1 500 SQL Error: $user"); exit;
@@ -110,45 +117,6 @@
 	}catch(ErrorException $ex){
 		$description = exc_handler_report($ex);
 		print $description;
-	}
-	
-	/* - не используется */
-	function getJsonFromFirst2($result = [],$item=false){
-		
-		$arr = false;
-		$strJson = '';
-		if(is_array($result) && (count($result)>0)){
-			
-			$strJson = '';
-		
-			$j = 0;
-			foreach($result as $key => $value){
-				
-				
-				if(!(is_array($key) || is_array($value))){
-					$strJson .= '"'.str_replace("\"","'",$key).'":';
-					$strJson .= '"'.str_replace("\"","'",$value).'"';
-					
-					
-				}else{
-					$arr = true;
-					$strJson .= getJsonFromFirst($value,true);
-				}
-				$j++;
-				if($j < count($result)){ $strJson .= ','; }
-			}
-			
-			if($arr){
-				$strJson = '1,"listData":['.$strJson.']';
-			}else{
-				if(!$item){ $strJson = '1,"data":{'.$strJson; }
-				else{ $strJson = '{'.$strJson; }
-				
-				$strJson .= '}';
-			}
-			
-		}
-		return $strJson;
 	}
 	
 	/* + используется */

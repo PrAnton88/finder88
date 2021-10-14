@@ -5,7 +5,14 @@ header('Content-type:text/html');
 	$sessAccesser = true;
 	require_once "../start.php";
 
-if($resolution){
+
+try{
+
+
+	if(!$resolution){
+		header("HTTP/1.1 403 Forbidden");
+		exit;
+	}
 	
 	require_once "../config.modx.php";
 	/* get $modx */
@@ -24,6 +31,9 @@ if($resolution){
         $listDevices = html_entity_decode(htmlspecialchars($_POST['listDevices']));
     }
 	if(isset($_POST['dataBusy'])){
+		/* к огромному сожалению, я пока передаю эту информацию, о записях на этот день */
+		/* а должен брать из базы, что бы данное точно не было скомпромитировано */
+		
         $dataBusy = html_entity_decode(htmlspecialchars($_POST['dataBusy']));
     }
 	if(isset($_POST['dateApply'])){
@@ -33,6 +43,18 @@ if($resolution){
         $openRecord = html_entity_decode(htmlspecialchars($_POST['openRecord']));
     }
 	
+	/* нужно взять информацию о правах авторизованного пользователя */
+	require_once "lib/query/get.query.UserLaws.php";
+	$queryLawsThisUser = getQueryToGetUserLaws("l.adminConversation,l.dispatchConversation");
+	$queryLawsThisUser .= " WHERE u.role = ".$uid;
+
+	$dataLaw = $db->fetchFirst($queryLawsThisUser,$uid);
+	if(is_string($dataLaw) && (strpos($dataLaw,'error')!== false)){
+		throw new ErrorException('SQL Error ');
+	}
+	
+	$smarty->assign("dataLawJson",json_encode($dataLaw));
+	$smarty->assign("dataLaw",$dataLaw);
 
 	if($listDevices && $dataBusy && $dateApply){
 		
@@ -174,7 +196,16 @@ userId: "108"
 	}
 	
 	
-}else{
-	header("HTTP/1.1 403 Forbidden");
+}catch(ErrorException $ex){
+	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
+	/*
+	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
+	*/
+}
+catch(Error $ex){
+	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
+	/*
+	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
+	*/
 }
 ?>

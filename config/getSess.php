@@ -1,14 +1,14 @@
 <?php
 
 	$sess = null;
-	if(isset($_SESSION) && isset($_SESSION['hsessid'])){
-		$sess = $_SESSION['hsessid'];
+	if(isset($_SESSION) && isset($_SESSION['modxhsessid'])){
+		$sess = $_SESSION['modxhsessid'];
 		
 		// echo " sess = $sess ";
 		
-	}elseif(isset($_COOKIE['csessid'])){
-		$sess = $_COOKIE['csessid'];
-		/*то выбрать sid по $_COOKIE['csessid']*/
+	}elseif(isset($_COOKIE['modxcsessid'])){
+		$sess = $_COOKIE['modxcsessid'];
+		/*то выбрать sid по $_COOKIE['modxcsessid']*/
 		
 		
 		// echo " sess = $sess ";
@@ -16,7 +16,7 @@
 		if($db && ($result = $db->fetchFirst($query))) $sess = $result["sid"];
 		//else echo " db not found ";
 	}else{
-		// echo " hsessid is not found, csessid is not found ";
+		// echo " modxhsessid is not found, modxcsessid is not found ";
 		
 	}
 

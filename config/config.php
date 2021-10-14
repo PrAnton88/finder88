@@ -23,10 +23,17 @@ ini_set('display_errors','On');
 	$deptToPortal = 75;
 	*/
 	
-
+	/*
 	define("DB_HOST","127.0.0.1");
 	define("DB_LOGIN","root");
 	define("DB_PASS","");
 	define("DB_NAME","modx-text");
+	*/
+	
+	define("DB_HOST","localhost:3333");
+	define("DB_LOGIN","root");
+	define("DB_PASS","newroot");
+	define("DB_NAME","info-base-text");
+	/* define("DB_NAME","infokng"); */
 	
 ?>
