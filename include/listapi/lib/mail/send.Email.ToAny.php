@@ -22,22 +22,17 @@ try{
 	}
 	$subject = $dataRecord['subject'];
 	
-	/* пока по невы¤сненной причине в $subject нельз¤ использовать кириллицу */
-	$subject = iconv("utf-8","windows-1251",$subject);
-	
 	
 	if(!isset($dataRecord['message'])){
 		$message = 'this message кириллица';
 	}
 	$message = $dataRecord['message'];
-	$message = iconv("utf-8","windows-1251",$message);
+	
 
-	$HeadMessage = iconv("utf-8","windows-1251","Здравствуйте!"); $HeadMessage .= '<br />';
-	$HeadMessage .= iconv("utf-8","windows-1251","Оповещаем вас как единственного получателя"); $HeadMessage .= '<br />';
+	$HeadMessage = 'Здравствуйте!<br />Оповещаем вас как единственного получателя<br />';
+	$HeadMessage = '<span class="normalText">  Здравствуйте!</span><br /><span class="normalText">Оповещаем вас как </span><span class="importantString" >единственного получателя</span><br />';
+	
 	$message = $HeadMessage.$message;
-
-
-
 
 	if(isset($_POST['dataListMail'])){
 		$dataListMail = html_entity_decode(htmlspecialchars($_POST['dataListMail']));
@@ -55,7 +50,8 @@ try{
 			echo '{"success":1,"description":"data email of itemMail in not found","countMails":"0"}';
 		}
 		
-		if(!sendEmail($itemMail,$subject,$message)){
+		/* if(!sendEmail($itemMail,$subject,$message)){ */
+		if(!sendMessage($db,$itemMail,$subject,false/*$n*/,$message/*,$sendCom=false*/)){
 			throw new ErrorException("—ообщение '$subject' не отправлено");
 		}
 	}

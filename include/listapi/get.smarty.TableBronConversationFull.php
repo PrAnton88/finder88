@@ -84,7 +84,7 @@ try{
 			
 			
 			/* нужно взять информацию о правах авторизованного пользователя */
-			require_once "lib/query/get.query.UserLaws.php";
+			// require_once "lib/query/get.query.UserLaws.php";
 			$queryLawsThisUser = getQueryToGetUserLaws("l.adminConversation,l.dispatchConversation");
 			$queryLawsThisUser .= " WHERE u.role = ".$uid;
 

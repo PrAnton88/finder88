@@ -33,16 +33,11 @@ try{
 	}
 	$subject = $dataRecord['subject'];
 	
-	/* пока по невы¤сненной причине в $subject нельз¤ использовать кириллицу */
-	$subject = iconv("utf-8","windows-1251",$subject);
-	
-	
 	if(!isset($dataRecord['message'])){
 		$message = 'this message кириллица';
 	}
 	$message = $dataRecord['message'];
-	$message = iconv("utf-8","windows-1251",$message);
-
+	
 
 	/* сначала необходимо выбрать список всех существующих прав */
 	/* и сравнить с переданным $dataRecord['law'] */
@@ -59,7 +54,7 @@ try{
 		exit;
 	}
 
-	$HeadMessage = iconv("utf-8","windows-1251","Здравствуйте!"); $HeadMessage .= '<br />';
+	
 	
 	$thisNameLaw = $resplistLaw['nameLaw'];
 	$thisNameLaw = trim($thisNameLaw);
@@ -70,12 +65,14 @@ try{
 		$thisNameLaw = $sNameLaw;
 	}
 	
-	$HeadMessage .= iconv("utf-8","windows-1251","Оповещаем вам как ".$thisNameLaw); $HeadMessage .= '<br />';
+	/* $HeadMessage = 'Здравствуйте!<br />Оповещаем вам как '.$thisNameLaw.'<br />'; */
+	$HeadMessage = '<span class="normalText">  Здравствуйте!</span><br /><span class="normalText">Оповещаем вас как </span><span class="importantString">'.$thisNameLaw.'</span><br />';
+	
 	$message = $HeadMessage.$message;
 
 
 
-	require_once "../query/get.query.UserLaws.php";
+	// require_once "../query/get.query.UserLaws.php";
 	$query = getQueryToGetUserLaws('l.'.$dataRecord['law']);
 	$query .= " WHERE l.".$dataRecord['law']."=1";
 	
@@ -97,7 +94,8 @@ try{
 			throw new ErrorException('data email of itemMail in not found');
 		}
 		
-		if(!sendEmail($itemMail,$subject,$message)){
+		/* if(!sendEmail($itemMail,$subject,$message)){ */
+		if(!sendMessage($db,$itemMail,$subject,false /*$n*/,$message/*,$sendCom=false*/)){
 			throw new ErrorException("Сообщение '$subject' не отправлено");
 		}
 	}

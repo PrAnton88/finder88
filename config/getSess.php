@@ -1,12 +1,13 @@
 <?php
 
 	$sess = null;
-	if(isset($_SESSION) && isset($_SESSION['modxhsessid'])){
+	
+	if(isset($_SESSION['modxhsessid']) and ($_SESSION['modxhsessid'] != "")){
 		$sess = $_SESSION['modxhsessid'];
 		
 		// echo " sess = $sess ";
 		
-	}elseif(isset($_COOKIE['modxcsessid'])){
+	}elseif(isset($_COOKIE['modxcsessid']) and ($_COOKIE['modxcsessid'] != "")){
 		$sess = $_COOKIE['modxcsessid'];
 		/*то выбрать sid по $_COOKIE['modxcsessid']*/
 		

@@ -175,7 +175,7 @@ try{
 
 		
 		$insertIdtick = $db->insert("bronedevicecomplete", 
-			array('userid'=>$uid,'note'=>$insertId), 
+			array('userid'=>$user["uid"]/*$uid*/,'note'=>$insertId), 
 			array('listdevice'=>$listdevice)
 		);
 			

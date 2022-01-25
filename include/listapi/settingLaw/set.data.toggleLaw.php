@@ -10,13 +10,18 @@ header('Content-type:application/json');
 
 try{
 	
-	$admin = ($user['priority'] == 3);
-	if(!$admin){ $resolution = false; }
+	if($resolution){
+		/* изменить права пользователя
+		может только Администратор Настройки Ролей */
+		$resolution = checkUserLaws('adminSettingLaw');
+	}
 	
 	if(!$resolution){
 		header("HTTP/1.1 403 Forbidden");
 		exit;
 	}
+	
+	
 
 	if(!isset($_POST['dataRecord'])){
 		throw new ErrorException('dataRecord is empty');
@@ -32,6 +37,12 @@ try{
 	
 	if(!isset($dataRecord['field'])){
 		throw new ErrorException('dataRecord.field is empty');
+	}
+	
+	/* если пользователь не adminRoot но поступил запрос на изменение adminRoot */
+	if((!checkUserLaws('adminRoot')) && ($dataRecord['field'] == 'adminRoot')){
+		header("HTTP/1.1 403 Forbidden");
+		exit;
 	}
 	
 	if(!isset($dataRecord['val'])){
@@ -52,7 +63,6 @@ try{
 	
 
 	/* лишь .uid и .field и .val */
-	
 	
 	
 	

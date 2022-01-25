@@ -46,7 +46,7 @@ try{
 	}
 
 	
-	require_once "query/get.query.UserLaws.php";
+	// require_once "query/get.query.UserLaws.php";
 	$query = getQueryToGetUserLaws('l.'.$dataRecord['law']);
 	
 	$query .= " WHERE l.".$dataRecord['law']."=1";

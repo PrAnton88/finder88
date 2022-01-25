@@ -3,13 +3,14 @@ header('Content-type:application/json;');
 /* но обрабатываться будет как json - поэтому весь вывод как json */
 
 	$getUserAuthData = true;
-	$sessAccesser = true;
+	/* $sessAccesser = true; */
 	
 	$path = '../';
 	require_once "$path../start.php";
 
 try{
 
+	/* возможно если закомментирован sessAccesser - то данная проверка неактуальна */
 	if(!$resolution){
 		header("HTTP/1.1 403 Forbidden"); exit;
 	}
@@ -34,8 +35,14 @@ try{
 		}
 	}
 	
-	
+	/* разрешать пользователю юыть неавторизованным, но только если он не зпарвшивает чьи то (чужие) данные */
 	if($whereable){
+		
+		if(count($user) == 0){
+			/* пользователь не авторизован но хочет получить чьи то данные */
+			header("HTTP/1.1 403 Forbidden"); exit;
+		}
+		
 		$queryUserData .= $whereable;
 		
 		$userData = $db->fetchAssoc($queryUserData,$uid);

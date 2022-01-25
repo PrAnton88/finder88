@@ -35,19 +35,96 @@ try{
 		}
 	}
 	
-	
 	/* свободные для бронирования устройства */
 	/* тут count - это количество свободных устройств, или свободных устройств + $editRecord */
 	/* .free = 2 это затребованные, = 0 это выданные */
 	
 	require_once $path."lib/query/get.query.ListDevices.php";
-	$query = getQueryToCheckFreeCountListDevice($type,$editRecord);
 	
+	
+	if(isset($_POST['checkBusy'])){
+		$query = getQueryToCheckBusyDevices($type);
+		
+		$result=$db->fetchAssoc($query,true);
+		if((is_string($result)) && (strpos($result,"error") !== false)){
+			throw new ErrorException($result);
+		}
+		/* n.id, n.name, n.description, b.idtick, b.datest, b.dateend, c.userid, u.fio */
+		
+		/* если заказ один и тот же, и устройство одно и то же */
+		/* то собираем в одну запись */
+		
+		if(count($result) > 0){
+			$n = 0;
+			$tmp = false;
+			$tikets = array(array('idtick'=>$result[0]['idtick'],'data'=>array()));
+			
+			
+			
+			$tmp = $result[0];
+			$tmp['count'] = 1;
+			$tikets[0]['data'][] = $tmp;
+			
+			$i = 0;
+			foreach($result as &$item){
+				
+				if($i > 0){
+					$tmp = $result[$i];
+					$tmp['count'] = 1;
+					if(($result[$i]['idtick']) === ($tikets[$n]['idtick'])){
+						$tikets[$n]['data'][] = $tmp;
+					}else{
+						$tikets[] = array('idtick'=>$result[$i]['idtick'],'data'=>array($tmp));
+						$n++;
+					}
+					if($i == count($result)){ break; }
+				}
+				
+				$i++;
+			}
+			
+			/* теперь идём по массиву устройсив в каждом из заказов */
+			/* и если идентификаторы устройств совпадают - увеличиваем count и убираем одру запись */
+			$i = 0;
+			foreach($tikets as &$tiket){
+				$n = 0;
+				foreach($tiket['data'] as &$device){
+				
+					if($n > 0){
+						if($device['name'] === $tiket['data'][$n-1]['name']){
+							
+							$tiket['data'][$n-1]['count'] += 1;
+							$device = null;
+							
+							unset($tiket['data'][$n]);
+						}
+						
+						
+					}
+					$n++;
+				}
+				
+			}
+			
+			// print_r($tikets);
+			
+			
+			
+			$result = $tikets;
+		}
+		
+	}else{
+		$query = getQueryToCheckFreeCountListDevice($type,$editRecord);
+		
+		$result=$db->fetchAssoc($query,true);
+		
+		
+	}
 	
 	
 	if(!isset($getImport)){
 		
-		$result=$db->fetchAssoc($query,true);
+		
 
 		if((is_string($result)) && (strpos($result,"error") !== false)){
 			throw new ErrorException($result);

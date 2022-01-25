@@ -10,8 +10,10 @@ header('Content-type:application/json');
 
 try{
 	
-	$admin = ($user['priority'] == 3);
-	if(!$admin){ $resolution = false; }
+	if($resolution){
+		/* добавлять пользователей в таблицу для раздачи прав может только Администратор Настройки Ролей */
+		$resolution = checkUserLaws('adminSettingLaw');
+	}
 	
 	if(!$resolution){
 		header("HTTP/1.1 403 Forbidden");
@@ -69,12 +71,16 @@ try{
 		
 		/* всё что не относится к полям в listlaw - то нужно убрать из $dataRecord */
 		$listLaw = array('uid'=>$dataRecord['uid'],
-			'adminConversation'=>$dataRecord['adminConversation'],
-			'dispatchConversation'=>$dataRecord['dispatchConversation'],
-			'dispatchToBroneDevice'=>$dataRecord['dispatchToBroneDevice'],
-			'adminSectionDocs'=>$dataRecord['adminSectionDocs']
+			'adminConversation'=>(isset($dataRecord['adminConversation'])?$dataRecord['adminConversation']:0),
+			'dispatchConversation'=>(isset($dataRecord['dispatchConversation'])?$dataRecord['dispatchConversation']:0),
+			'dispatchToBroneDevice'=>(isset($dataRecord['dispatchToBroneDevice'])?$dataRecord['dispatchToBroneDevice']:0),
+			'adminSettingLaw'=>(isset($dataRecord['adminSettingLaw'])?$dataRecord['adminSettingLaw']:0)
 		);
 		
+		
+		/* список прав пользователя выбираем из $query = getQueryUserLaws($db);
+		$query .= " WHERE u.role = ".$uid;
+		$dataLawsOfUser = $db->fetchFirst($query); */
 		
 		$respInsert = $db->insert("law", $listLaw, array());
 		

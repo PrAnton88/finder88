@@ -7,14 +7,17 @@ class DB
 	var $userid;
 	var $queryTime = 0;
 	var $newFileName = "";
-	public function __construct()
+	public function __construct($db_name)
 	{
+		
+		// if($db_name === false){ $db_name = DB_NAME; }
+		
 		
 		// global $db_host, $db_name, $db_login, $db_pass;
 		$this->queryCounter = 0;
 		$conn = mysqli_connect(DB_HOST, DB_LOGIN, DB_PASS) or die("Информационный портал временно недоступен. Попробуйте позже.");
 
-		mysqli_select_db($conn,DB_NAME) or die ('Can\'t use : ' . mysqli_error($conn));
+		mysqli_select_db($conn,$db_name) or die ('Can\'t use : ' . mysqli_error($conn));
 		//mysql_query('SET CHARSET cp1251');
 		//mysql_query('SET CHARSET utf8');
 		

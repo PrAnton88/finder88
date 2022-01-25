@@ -20,17 +20,10 @@ try{
 	}
 	$subject = $dataRecord['subject'];
 	
-	/* пока по невы¤сненной причине в $subject нельз¤ использовать кириллицу */
-	$subject = iconv("utf-8","windows-1251",$subject);
-	
-	
 	if(!isset($dataRecord['message'])){
 		$message = 'this message кириллица';
 	}
 	$message = $dataRecord['message'];
-	$message = iconv("utf-8","windows-1251",$message);
-
-
 	
 	$dataListMail = [$user];
 	
@@ -40,7 +33,8 @@ try{
 			throw new ErrorException('data email of itemMail in not found');
 		}
 		
-		if(!sendEmail($itemMail,$subject,$message)){
+		/* if(!sendEmail($itemMail,$subject,$message)){ */
+		if(!sendMessage($db,$itemMail,$subject,false /*$n*/,$message/*,$sendCom=false*/)){
 			throw new ErrorException("—ообщение '$subject' не отправлено");
 		}
 	}

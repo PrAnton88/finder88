@@ -20,9 +20,6 @@ try{
 	}
 	$subject = $dataRecord['subject'];
 	
-	/* пока по невы¤сненной причине в $subject нельз¤ использовать кириллицу */
-	$subject = iconv("utf-8","windows-1251",$subject);
-	
 	
 	if(!isset($dataRecord['message'])){
 		throw new ErrorException('arg message is not found');
@@ -30,16 +27,9 @@ try{
 	$message = $dataRecord['message'];
 	
 	
-	$message = iconv("utf-8","windows-1251",$message);
-	$HeadMessage = iconv("utf-8","windows-1251","Здравствуйте!"); $HeadMessage .= '<br />';
-	$HeadMessage .= iconv("utf-8","windows-1251","Оповещаем вас как подписанного на оповещения о новых заявках."); $HeadMessage .= '<br />';
-	
-	/*
-	$HeadMessage = "Здравствуйте!<br />Оповещаем вас как подписанного на оповещения о новых заявках.<br />";
-	*/
+	$HeadMessage = '<span class="normalText">  Здравствуйте!</span><br /><span class="normalText">Оповещаем вас как </span><a class="importantString" href="http://info:86/index.php?id=68">подписанного на оповещения</a><span class="normalText"> о новых заявках.</span><br />';
 	$message = $HeadMessage.$message;
 	
-
 
 	/* выбираем в массив $dataListMail подписаных на оповещения */
 	/* $queryAdminsCkeckeds < queryUserData.php < ../../../start.php */
@@ -59,8 +49,9 @@ try{
 			throw new ErrorException('data email of itemMail in not found');
 		}
 		
-		if(!sendEmail($itemMail,$subject,$message)){
-			throw new ErrorException("Сообщение '$subject' не отправлено");
+		/* if(!sendEmail($itemMail,$subject,$message)){ */
+		if(!sendMessage($db,$itemMail,$subject,2 /*$n*/,$message/*,$sendCom=false*/)){
+			throw new ErrorException("this process send message '$subject' returned false");
 		}
 	}
 

@@ -80,10 +80,23 @@ try{
 				}else{ $hidden = false; }
 			}
 			
+			$type = 0;
+			if(isset($dataRecord['type'])){
+				$type = (int) $dataRecord['type'];
+			}
+			
+			$link = 0;
+			if(isset($dataRecord['link'])){
+				$link = (int) $dataRecord['link'];
+			}
+			/* if($link == 0){ $link = NULL; } */
+			
+			
 			$nrequest = false;
 			if(isset($dataRecord['nrequest'])){
 				$nrequest = (int)$dataRecord['nrequest'];
 			}
+			
 			/* если $nrequest - то редактирование или коммент */
 				/* если $nrequest и не $comment то редактированрие $title и $body */
 			
@@ -123,7 +136,7 @@ try{
 					
 					$date = date("Y-m-d H:i:s");
 					
-					$respInsert = $db->insert("request", array('user_link'=>'NULL', 'applicant'=>$id, 'state'=>0, 'priority'=>0, 'opened'=>"'$date'", 'user_apdate'=>$id), array('header'=>$title, 'message'=>$body));
+					$respInsert = $db->insert("request", array('type'=>$type, 'user_link'=>'NULL', 'applicant'=>$id, 'state'=>0, 'priority'=>0, 'opened'=>"'$date'", 'user_apdate'=>$id, 'link'=>($link == 0?'NULL':$link)), array('header'=>$title, 'message'=>$body));
 					
 					if(!$respInsert){
 						$description .= " По невыясненной причине заявка от пользователя $id - $title - $body, не создана. ";

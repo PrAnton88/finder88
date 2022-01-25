@@ -28,6 +28,8 @@
 		
 		
 		require_once("error.reporting.php");
+		// require_once("error.reporting.asInterface.php");
+		
 		require_once("queryUserData.php");
 		
 		// trigger_error("This event WILL fire", E_WARNING);
@@ -203,4 +205,22 @@
 		return $strJson;
 	}
 	
+	function checkUserLaws($nameLaw){
+		
+		global $db;
+		global $uid;
+		
+		if($nameLaw == ''){ return false; }
+		if($uid === true){ return false; }
+		
+		
+		$query = getQueryUserLaws($db);
+		$query .= " WHERE u.role = ".$uid;
+		
+		$dataLawsOfUser = $db->fetchFirst($query);
+		if(!$dataLawsOfUser[$nameLaw]){
+			return false;
+		}
+		return true;
+	}
 ?>

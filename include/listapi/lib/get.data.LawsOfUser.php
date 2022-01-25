@@ -1,5 +1,5 @@
 <?php
-header('Content-type:text/html');
+header('Content-type:application/json');
 /* но обрабатываться будет как json - поэтому весь вывод как json */
 
 	$getUserAuthData = true;
@@ -32,7 +32,7 @@ try{
 	
 	
 	
-	
+	/*
 	$listLaw = ["l.id as lawid","l.uid"];
 	$query = 'SELECT id,nameField,nameLaw,messHelp FROM listlaw';
 	$resplistLaw = $db->fetchAssoc($query,$uid);
@@ -46,11 +46,15 @@ try{
 	$listLaw = implode(", ", $listLaw);
 	
 	
-
+	$query = getQueryToGetUserLaws($listLaw);
+	*/
 	
+	$query = getQueryUserLaws($db);
 	
+	/*
 	$query = "SELECT $listLaw, u.id, concat_ws(' ', u.last_name, u.first_name, u.patronymic) 'fio', u.post 'prof' FROM law as l LEFT JOIN users as u ON u.role = l.uid";
-
+	*/
+	
 	if($dataRecord && (isset($dataRecord['uid']))){
 		
 		$query .= " WHERE u.role = ".$dataRecord['uid'];
@@ -58,7 +62,7 @@ try{
 
 	$usersLaws = $db->fetchAssoc($query,$uid);
 	if(is_string($usersLaws) && (strpos($usersLaws,'error')!== false)){
-		throw new ErrorException('SQL Error');
+		throw new ErrorException('SQL Error ');
 	}
 	
 

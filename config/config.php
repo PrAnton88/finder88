@@ -33,7 +33,7 @@ ini_set('display_errors','On');
 	define("DB_HOST","localhost:3333");
 	define("DB_LOGIN","root");
 	define("DB_PASS","newroot");
-	define("DB_NAME","info-base-text");
+	// define("DB_NAME","info-base-text");
 	/* define("DB_NAME","infokng"); */
 	
 ?>

@@ -8,9 +8,9 @@ header('Content-type:text/html');
 	require_once "$path../start.php";
 
 try{
-
-	$admin = ($user['priority'] == 3);
-	if(!$admin){ $resolution = false; }
+	if($resolution){
+		$resolution = checkUserLaws('adminSettingLaw');
+	}
 
 	if(!$resolution){
 		header("HTTP/1.1 403 Forbidden"); exit;
@@ -58,7 +58,11 @@ try{
 	
 	
 	$listLaw = ["l.id as lawid","l.uid"];
-	$query = 'SELECT id,nameField,nameLaw,messHelp FROM listlaw';
+	$query = "SELECT id,nameField,nameLaw,messHelp FROM listlaw ";
+	if(!checkUserLaws('adminRoot')){
+		$query .= " WHERE nameField<>'adminRoot'";
+	}
+	
 	$resplistLaw = $db->fetchAssoc($query,$uid);
 	if(is_string($resplistLaw) && (strpos($resplistLaw,'error')!== false)){
 		throw new ErrorException('SQL Error');
@@ -81,10 +85,6 @@ try{
 	}
 	
 	$smarty->assign("usersLaws",json_encode($usersLaws));
-	
-	
-	
-	
 	
 	$smarty->assign("admin",$admin);
 	$smarty->assign("user",$user);

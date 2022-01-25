@@ -30,21 +30,16 @@ try{
 	}
 	$subject = $dataRecord['subject'];
 	
-	/* пока по невы¤сненной причине в $subject нельз¤ использовать кириллицу */
-	$subject = iconv("utf-8","windows-1251",$subject);
-	
-	
 	if(!isset($dataRecord['message'])){
 		throw new ErrorException('arg message is not found');
 	}
 	$message = $dataRecord['message'];
-	$message = iconv("utf-8","windows-1251",$message);
+	
 
-	$HeadMessage = iconv("utf-8","windows-1251","Здравствуйте!"); $HeadMessage .= '<br />';
-	$HeadMessage .= iconv("utf-8","windows-1251","Оповещаем вас как ответственного на заявку"); $HeadMessage .= '<br />';
+	/* $HeadMessage = 'Здравствуйте!<br />Оповещаем вас как ответственного на заявку<br />'; */
+	$HeadMessage = '<span class="normalText">  Здравствуйте!</span><br /><span class="normalText">Оповещаем вас как </span><span class="importantString">ответственного на заявку</span><br />';
+	
 	$message = $HeadMessage.$message;
-
-
 
 	/* нужно выбрать данные пользователя ответственного к заявке */
 	/* в массив $itemMail */
@@ -60,7 +55,13 @@ try{
 		echo '{"success":1,"description":"data email of itemMail in not found","countMails":"0"}';
 	}
 	
-	if(!sendEmail($itemMail,$subject,$message)){
+	/* if(!sendEmail($itemMail,$subject,$message)){ */
+	/*1 - оповещени¤ о назначении ответственным */
+	/*2 - оповещени¤ о новых за¤вках */
+	/*3 - оповещени¤ об изменениях к заявке */
+	/* похоже тут либо 3 либо 1 */
+	
+	if(!sendMessage($db,$itemMail,$subject,3 /*$n*/,$message/*,$sendCom=false*/)){
 		throw new ErrorException("Сообщение '$subject' не отправлено");
 	}
 	
