@@ -1,10 +1,16 @@
 <?php
 	if($sess){
 		
-		$query = "SELECT uid FROM sessions WHERE sid = '$sess' or id = '$sess'";
-		$result = $db->fetchFirst($query);
+		$query = "SELECT uid FROM sessions WHERE sid = '$sess'";
+		$result = $db->fetchFirst($query,true);
+		if((is_string($result)) && (strpos($result,"error") !== false)){
+			throw new ErrorException("500 SQL Error");
+		}
 		
-		if(is_array($result)){
+		if(count($result)>0){
+			
+			// echo $sess;
+			
 			$uid = $result['uid'];
 			/*$uid - роль*/	
 		}else{
@@ -14,6 +20,7 @@
 		
 		
 	}else{
+		$uid = false;
 		echo "sess is not found";
 	}
 ?>

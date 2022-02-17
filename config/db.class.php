@@ -16,6 +16,7 @@ class DB
 		// global $db_host, $db_name, $db_login, $db_pass;
 		$this->queryCounter = 0;
 		$conn = mysqli_connect(DB_HOST, DB_LOGIN, DB_PASS) or die("Информационный портал временно недоступен. Попробуйте позже.");
+		// $link = mysqli_connect($db_host,$db_user,$db_pass,$db_database,$db_port);
 
 		mysqli_select_db($conn,$db_name) or die ('Can\'t use : ' . mysqli_error($conn));
 		//mysql_query('SET CHARSET cp1251');

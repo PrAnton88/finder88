@@ -1,13 +1,45 @@
 <?php
 	
+	/* session_start();
+	ini_set('display_errors', 'On'); */
+	
 	/* getUserData(&$db,&$uid,$where) */
 	/* getUserDataWithoutOptions(&$db,&$uid,$where) */
 	require_once "queryUserData.php";
 	// require_once(PATH."queryUserData.php");
 	
 	try{
+		
+		
+		function fwriteLog($mess){
+
+			global $path;
+			if(!isset($path)){ $pth = "$path../"; }else{ $pth = ""; }
+			
+
+			if(file_exists($pth."anyEvents.txt")){
+				$log=fopen($pth."anyEvents.txt","a+");
+				
+				$ip = $_SERVER['REMOTE_ADDR'];
+				$serv = $_SERVER['HTTP_HOST'];
+			
+				fwrite($log, 
+					"\t".date("d-m-Y H:i:s").'	|| '.(function_exists('fgetBrovser')?fgetBrovser():'----').'	|ip: ' .$ip.'   |serv = '.$serv."\r\n".str_replace("&amp;","&",$_SERVER['REQUEST_URI'])."\r\n".
+					($mess?($mess):"")."\r\n\r\n"
+				);
+				
+				fclose($log);
+				
+			}else{
+				fopen($pth."anyEvents.txt","w+");
+				fwriteLog($mess,$pth);
+			}
+		}
+		
 		session_start();
 		ini_set('display_errors', 'On');
+		
+		
 		
 		/*
 		if(strstr($_SERVER["HTTP_USER_AGENT"],"MSIE") !== false) {
@@ -49,18 +81,24 @@
 			/*get $sess*/
 			
 			if($sess){
+				fwriteLog('Проверяем авторизован ли пользователь ');
+				
 				
 				require_once(PATH."config/getSessUid.php"); /* get $uid */
 				
 				/* когда в БД не удалось найти пользователя по сессии */
 				if(!$uid){
-				
+					/* была получена сессия / куки, но в БД пользователя по ним найти не удалось */
+					
+					fwriteLog('Пользователь НЕ найден. Очистка Кук и Сессий!!!');
+					
 					/* она мешает и её нужно удалить */
-					$_SESSION['hsessid'] = '';
+					$_SESSION[SSESSID] = '';
 					session_destroy();
-					$_COOKIE['csessid'] = '';
+					$_COOKIE[CSESSID] = '';
 					//setcookie('csessid');
-					setcookie("csessid", "", time() - 3600);
+					// setcookie(CSESSID, "", time() - 3600, '/');
+					setcookie(CSESSID, "", time() - 3600);
 					
 					if(isset($sessAccesser) && $sessAccesser){
 						$resolution = false;
@@ -77,6 +115,12 @@
 						$user = array();
 						// header("HTTP/1.1 500 SQL Error: $user"); exit;
 						/* то есть не приводить к ошибке если авторизация пользователя гараньтированно не требуется */
+						
+						fwriteLog('Пользователь НЕ найден');
+					}else{
+						
+						fwriteLog('Пользователь найден');
+						fwriteLog(json_encode($user));
 					}
 					
 					/* если обязаны допускать только авторизованных пользователей */
@@ -99,7 +143,14 @@
 			}else{
 				$uid = true; /* при отсутвтсии sess, допускать запросы к БД через ajax, если не установлена переменная sessAccesser */
 				$resolution = true;
+				
+				// fwriteLog('Сессия отсутствует. Пользователь не авторизован ');
+				
 			}
+			
+			
+			fwriteLog('===============================================================');
+			
 		}
 		// при отсутствии getUserAuthData, $resolution может установиться в зн-е false только при несоответствии селектору
 		

@@ -30,10 +30,18 @@ ini_set('display_errors','On');
 	define("DB_NAME","modx-text");
 	*/
 	
-	define("DB_HOST","localhost:3333");
-	define("DB_LOGIN","root");
-	define("DB_PASS","newroot");
-	// define("DB_NAME","info-base-text");
-	/* define("DB_NAME","infokng"); */
 	
+	// use local database
+	define("DB_HOST","localhost");
+	define("DB_LOGIN","root");
+	define("DB_PASS","");
+	
+	
+	/*define("DB_HOST","192.168.7.254:3333");
+	define("DB_LOGIN","root");
+	define("DB_PASS","newroot"); */
+	
+	
+	define('SSESSID',"modxlocalhsessid");
+	define('CSESSID',"modxlocalcsessid");
 ?>

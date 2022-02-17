@@ -1,6 +1,6 @@
 <?php
 header('Content-type:application/json;');
-/* но обрабатываться будет как json - поэтому весь вывод как json */
+	/* обрабатываться будет как json - весь вывод в json */
 
 	$getUserAuthData = true;
 	/* $sessAccesser = true; */
@@ -54,10 +54,14 @@ try{
 		$userData = $user;
 	}
 	
+	// fwriteLog('Тест: была выдана информация опользователе '.json_encode($userData));
 
 	echo '{"success":1,"data":'.json_encode($userData).'}';
 	
 }catch(ErrorException $ex){
+	
+	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
+}catch(Error $ex){
 	
 	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
 }
