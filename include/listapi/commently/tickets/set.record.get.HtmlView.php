@@ -114,8 +114,6 @@ try{
 	
 
 	/* новая запись */
-
-
 	require_once $path."lib/query/get.query.ListTickets.php";
 	$query = getQueryToGetTickets();
 		
@@ -200,7 +198,7 @@ try{
 
 			echo '<script>customMess("Комментарий добавлен");';
 			
-			/* и оповещения eny changes */
+			/* и оповещения */
 			
 			
 			
@@ -216,7 +214,6 @@ try{
 			if(($hidden != 0) || (($hidden == 0) && ((int)$nParent > 0) && checkPrivateParentComment($nParent))){
 				$isPrivate = true;
 			}
-			
 			
 			
 			echo '</script>';
