@@ -182,12 +182,14 @@ try{
 			
 			// $nRecord, /* номер заявки или номер ресурса */
 			
+			$comment = str_replace("\n","<br/>",$comment);
+			
 			echo $chunk->process(array(
 				'id' => $nRecord,
 				'nparent' => ($nParent && ( ((int) $nParent) != 0))?1:0,
 				'author' => $user["fio"],
 				'datetime' => $dateReg,
-				'content' => str_replace("\n","<br/>",$comment),
+				'content' => $comment,
 				'title' => $title,
 				'hidden' => $hidden,
 				'ncommon' => $nCommon,
