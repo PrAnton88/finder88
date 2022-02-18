@@ -14,11 +14,11 @@
 		function fwriteLog($mess){
 
 			global $path;
-			if(!isset($path)){ $pth = "$path../"; }else{ $pth = ""; }
+			if(!isset($path)){ $path = ""; }
 			
 
-			if(file_exists($pth."anyEvents.txt")){
-				$log=fopen($pth."anyEvents.txt","a+");
+			if(file_exists("$path../anyEvents.txt")){
+				$log=fopen("$path../anyEvents.txt","a+");
 				
 				$ip = $_SERVER['REMOTE_ADDR'];
 				$serv = $_SERVER['HTTP_HOST'];
@@ -31,8 +31,8 @@
 				fclose($log);
 				
 			}else{
-				fopen($pth."anyEvents.txt","w+");
-				fwriteLog($mess,$pth);
+				fopen("$path../anyEvents.txt","w+");
+				fwriteLog($mess);
 			}
 		}
 		
