@@ -215,7 +215,77 @@ try{
 				$isPrivate = true;
 			}
 			
+			echo '(function(){';
+				echo 'let completeSend = function (){ customMess("Сообщение отправлено"); };';
+				echo 'let dataMessage = {};';
+				
+				echo 'dataMessage.nrequest = '.$nRecord.';';
+				
+				echo 'dataMessage.description = "';
+				if($title != ''){
+					echo $title.'<br />';
+				}
+				echo $comment.'";';
+				echo 'dataMessage.subject = "new Comment";';
+				
+				
+				echo 'let oSender = oBaseAPI.message.email;';
+				
+				
+				if($message['applicant']==$user['uid']){
+					/* оставил коммент - заявитель (хоть админ он хоть не админ) */
+					/* оповестим Ответственного - если назначен ответстыенный на заявку */
+					
+					if($message['assd'] != ''){
+						
+						echo 'dataMessage.note = "Оповещение ответственному";';
+						echo 'oSender.sendToAssdTickets';
+						
+					}else{
+						
+						echo 'dataMessage.note = "Оповещение инициатору - Ответственный на вашу заявку ещё не назначен";';
+						echo 'oSender.sendToApplicantTickets';
+						
+					}
+				}elseif($admin != 0){
+					/* оставил коммент кто то из админов - возможно ответственный, или любой другой */
+					
+					
+					if($message['assd']==$user['uid']){
+						/* Ответственный на заявку */
+						
+						/* если коммент не приватен и заявитель не админ */
+						/* или заявитель админ */
+						
+						if(($message['applicantPrior'] == 3) || ((!$isPrivate) && ($message['applicantPrior'] != 3))){
+							/* оповестим заявителя */
+							echo 'dataMessage.note = "Оповещение заявителю";';
+							
+							echo 'oSender.sendToApplicantTickets';
+							
+							
+						}
+					}else{
+						/* "Сторонняя помощь" */
+						/* 1. оповестим ответственного (как минимум ответственный должен быть с правами админа) */
+						/* 2. оповестим заявителя - если коммент не приватен и заявитель не админ или заявитель админ */
+						
+						echo 'dataMessage.note = "Оповещение ответственному";';
+						
+						/* 1. оповестим ответственного */
+						echo 'oSender.sendToAssdTickets(dataMessage,completeSend);';
+						
+						if(($message['applicantPrior'] == 3) || ((!$isPrivate) && ($message['applicantPrior'] != 3))){
+							/* 2. оповестим заявителя */
+							echo 'dataMessage.note = "Оповещение заявителю";';
+							
+							echo 'oSender.sendToApplicantTickets';
+						}
+					}
+				}
+				echo '(dataMessage,completeSend);';
 			
+			echo '})();';
 			echo '</script>';
 		}else{
 			echo '<li class="nothing-here">arg comment is not found!</li>';
