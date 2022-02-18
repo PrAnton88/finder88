@@ -308,7 +308,7 @@ try{
 
 	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
 	
-}catch(Error $ex){
+}catch(Exception $ex){
 	
 	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
 }
