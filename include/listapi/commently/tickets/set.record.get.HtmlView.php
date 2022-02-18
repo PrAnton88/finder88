@@ -169,8 +169,10 @@ try{
 		'name' => 'commentItem'
 	));
 	
+	$display = '';
+	
 	if(!$chunk){ 
-		echo '<li class="nothing-here">chunk commentItem is not found!</li>';
+		$display .= '<li class="nothing-here">chunk commentItem is not found!</li>';
 	}else{ 
 		
 		if($comment != ''){
@@ -184,7 +186,7 @@ try{
 			
 			$comment = str_replace("\n","<br/>",$comment);
 			
-			echo $chunk->process(array(
+			$display .= $chunk->process(array(
 				'id' => $nRecord,
 				'nparent' => ($nParent && ( ((int) $nParent) != 0))?1:0,
 				'author' => $user["fio"],
@@ -198,7 +200,7 @@ try{
 				'repliedly' => 1
 			));
 
-			echo '<script>customMess("Комментарий добавлен");';
+			$display .= '<script>customMess("Комментарий добавлен");';
 			
 			/* и оповещения */
 			
@@ -217,22 +219,21 @@ try{
 				$isPrivate = true;
 			}
 			
-			echo '(function(){';
-				echo 'let completeSend = function (){ customMess("Сообщение отправлено"); };';
-				echo 'let dataMessage = {};';
+			$display .= '(function(){';
+				$display .= 'let completeSend = function (){ customMess("Сообщение отправлено"); };';
+				$display .= 'let dataMessage = {};';
 				
-				echo 'dataMessage.nrequest = '.$nRecord.';';
+				$display .= 'dataMessage.nrequest = '.$nRecord.';';
 				
-				echo 'dataMessage.description = "';
+				$display .= 'dataMessage.description = "';
 				if($title != ''){
-					echo $title.'<br />';
+					$display .= $title.'<br />';
 				}
-				echo $comment.'";';
-				echo 'dataMessage.subject = "new Comment";';
+				$display .= $comment.'";';
+				$display .= 'dataMessage.subject = "new Comment";';
 				
 				
-				echo 'let oSender = oBaseAPI.message.email;';
-				
+				$display .= 'let oSender = oBaseAPI.message.email;';
 				
 				if($message['applicant']==$user['uid']){
 					/* оставил коммент - заявитель (хоть админ он хоть не админ) */
@@ -240,13 +241,13 @@ try{
 					
 					if($message['assd'] != ''){
 						
-						echo 'dataMessage.note = "Оповещение ответственному";';
-						echo 'oSender.sendToAssdTickets';
+						$display .= 'dataMessage.note = "Оповещение ответственному";';
+						$display .= 'oSender.sendToAssdTickets';
 						
 					}else{
 						
-						echo 'dataMessage.note = "Оповещение инициатору - Ответственный на вашу заявку ещё не назначен";';
-						echo 'oSender.sendToApplicantTickets';
+						$display .= 'dataMessage.note = "Оповещение инициатору - Ответственный на вашу заявку ещё не назначен";';
+						$display .= 'oSender.sendToApplicantTickets';
 						
 					}
 				}elseif($admin != 0){
@@ -261,9 +262,9 @@ try{
 						
 						if(($message['applicantPrior'] == 3) || ((!$isPrivate) && ($message['applicantPrior'] != 3))){
 							/* оповестим заявителя */
-							echo 'dataMessage.note = "Оповещение заявителю";';
+							$display .= 'dataMessage.note = "Оповещение заявителю";';
 							
-							echo 'oSender.sendToApplicantTickets';
+							$display .= 'oSender.sendToApplicantTickets';
 							
 							
 						}
@@ -272,29 +273,30 @@ try{
 						/* 1. оповестим ответственного (как минимум ответственный должен быть с правами админа) */
 						/* 2. оповестим заявителя - если коммент не приватен и заявитель не админ или заявитель админ */
 						
-						echo 'dataMessage.note = "Оповещение ответственному";';
+						$display .= 'dataMessage.note = "Оповещение ответственному";';
 						
 						/* 1. оповестим ответственного */
-						echo 'oSender.sendToAssdTickets(dataMessage,completeSend);';
+						$display .= 'oSender.sendToAssdTickets(dataMessage,completeSend);';
 						
 						if(($message['applicantPrior'] == 3) || ((!$isPrivate) && ($message['applicantPrior'] != 3))){
 							/* 2. оповестим заявителя */
-							echo 'dataMessage.note = "Оповещение заявителю";';
+							$display .= 'dataMessage.note = "Оповещение заявителю";';
 							
-							echo 'oSender.sendToApplicantTickets';
+							$display .= 'oSender.sendToApplicantTickets';
 						}
 					}
 				}
-				echo '(dataMessage,completeSend);';
+				$display .= '(dataMessage,completeSend);';
 			
-			echo '})();';
-			echo '</script>';
+			$display .= '})();';
+			$display .= '</script>';
 		}else{
-			echo '<li class="nothing-here">arg comment is not found!</li>';
+			$display .= '<li class="nothing-here">arg comment is not found!</li>';
 		}
 		
-		
 	}
+	
+	echo $display;
 	
 	header("HTTP/1.1 200 Ok");
 	exit;
@@ -303,7 +305,7 @@ try{
 	/* если application/json 
 	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
 	*/
-	 
+
 	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
 	
 }catch(Error $ex){
