@@ -41,8 +41,8 @@ function attemptHtml(&$list){
 	}
 }
 
-$listPos = array("theme","measure","description","message","date","time","datetime","applicant","fio","email","note","devices","nrequest","user");
-$listAlias = array("Тема: ","","","","На: ","На: ","На: ","Инициатор: ","Инициатор: ","Почта инициатора: ","","Необходимое оборудование: ",
+$listPos = array("theme","measure","ashtml","description","message","date","time","datetime","applicant","fio","email","note","devices","nrequest","user");
+$listAlias = array("Тема: ","","Представление html","","","На: ","На: ","На: ","Инициатор: ","Инициатор: ","Почта инициатора: ","","Необходимое оборудование: ",
 	"<br /><br />Что бы перейти к заявке пройдите, пожалуйста, по ","Пользователь: "
 );
 	
@@ -147,20 +147,29 @@ if($resolution){
 		$display = '';
 		/* интересуют alias и value */
 		foreach($dataRecord as $item){
-			if($item["field"] == "note"){ 
-				$display .= '<span class="forNotes">/* '; 
-			}else{
-				$display .= '<span class="italicBoldNote">'.$item["alias"];
+			
+			
+			if($item["field"] != "ashtml"){ 
+			
+				if($item["field"] == "note"){ 
+					$display .= '<span class="forNotes">/* '; 
+				}else{
+					$display .= '<span class="italicBoldNote">'.$item["alias"];
+					
+				}
 				
+				$display .= $item["value"];
+				
+				if($item["field"] == "note"){ 
+					$display .= ' */'; 
+				}
+				
+				$display .= '</span><br />';
+			}else{
+				
+				$display .= $item["value"].'<br />';
 			}
 			
-			$display .= $item["value"];
-			
-			if($item["field"] == "note"){ 
-				$display .= ' */'; 
-			}
-			
-			$display .= '</span><br />';
 		}
 	
 		echo $display;
