@@ -67,8 +67,6 @@ try{
 	
 	echo '}';
 	
-}catch(Error $ex){
-	echo '{"success":0,"description":"'.exc_handler($ex).'","countMails":"null"}';
 }catch(Exception $ex){
 	echo '{"success":0,"description":"'.exc_handler($ex).'","countMails":"null"}';
 }

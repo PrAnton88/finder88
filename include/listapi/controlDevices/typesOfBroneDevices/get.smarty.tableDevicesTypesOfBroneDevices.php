@@ -30,5 +30,9 @@ try{
 	return $smarty->display('error.formDataIsNotFound.tpl');
 	*/
 	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
+
+}catch(Exception $ex){
+	
+	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
 }
 ?>

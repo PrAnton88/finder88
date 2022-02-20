@@ -202,7 +202,7 @@ userId: "108"
 	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
 	*/
 }
-catch(Error $ex){
+catch(Exception $ex){
 	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
 	/*
 	echo '{"success":0,"description":"'.exc_handler($ex).'"}';

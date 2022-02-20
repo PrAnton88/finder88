@@ -46,9 +46,6 @@ try{
 	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
 	*/
 	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
-}catch(Error $ex){
-	
-	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
 }catch(Exception $ex){
 	
 	echo '{"success":0,"description":"'.exc_handler($ex).'"}';

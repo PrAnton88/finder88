@@ -262,7 +262,7 @@ try{
 	/* если text/html 
 	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
 	*/
-}catch(Error $ex){
+}catch(Exception $ex){
 	
 	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
 }

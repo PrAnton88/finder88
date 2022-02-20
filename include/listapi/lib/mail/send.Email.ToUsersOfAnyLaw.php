@@ -107,9 +107,6 @@ try{
 	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
 	*/
 	echo '{"success":0,"description":"'.exc_handler($ex).'","countMails":"'.count($dataListMail).'"}';
-}catch(Error $ex){
-	
-	echo '{"success":0,"description":"'.exc_handler($ex).'","countMails":"null"}';
 }catch(Exception $ex){
 	
 	echo '{"success":0,"description":"'.exc_handler($ex).'","countMails":"null"}';
