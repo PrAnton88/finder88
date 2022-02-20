@@ -186,7 +186,7 @@ try{
 			
 			$comment = str_replace("\n","<br/>",$comment);
 			
-			$display .= $chunk->process(array(
+			$ashtml = $chunk->process(array(
 				'id' => $nRecord,
 				'nparent' => ($nParent && ( ((int) $nParent) != 0))?1:0,
 				'author' => $user["fio"],
@@ -200,6 +200,7 @@ try{
 				'repliedly' => 1
 			));
 
+			$display .= $ashtml;
 			$display .= '<script>customMess("Комментарий добавлен");';
 			
 			/* и оповещения */
@@ -231,6 +232,16 @@ try{
 				}
 				$display .= $comment.'";';
 				$display .= 'dataMessage.subject = "new Comment";';
+				
+				/*
+				$ashtml = (string)$ashtml;
+				$ashtml = str_replace("\n","",$ashtml);
+				$ashtml = str_replace("//","\/\/",$ashtml);//for url
+				$ashtml = str_replace('"',"'",$ashtml);
+				$ashtml = str_replace('\t','',$ashtml);
+				$ashtml = str_replace('&','ampersand',$ashtml);//for url
+				$display .= 'dataMessage.ashtml = "'.$ashtml.'";';
+				*/
 				
 				
 				$display .= 'let oSender = oBaseAPI.message.email;';
