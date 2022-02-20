@@ -246,6 +246,40 @@ try{
 				
 				$display .= 'let oSender = oBaseAPI.message.email;';
 				
+				if($nParent != ''){
+					/* заявитель и / или инициатор так и так будут оповещены (см ниже) */
+					/* теперь выберем данные о пользователе который сделал родительский комментарий */
+					/* и если родительский комментарий не от заявителя и не от инициатора */
+					/* то оповестим ещё и его */
+					$query = "SELECT user_link FROM comments WHERE id = $nParent";
+					
+					$messageParent = $db->fetchFirst($query,true);
+					if( is_string($messageParent) && (strpos($messageParent,"error") !== false)){
+						throw new ErrorException("SQL for get record ticket has failed");
+					}
+					
+					if(
+						($messageParent["user_link"] != $user['uid']) &&
+						($messageParent["user_link"] != $message['applicant']) &&
+						( ($message['assd'] == '') || ($messageParent["user_link"] != $message['assd']) )
+					){
+						
+						/* необходимо узнать и права того сотрудника */
+						/* отправляем если
+						комментарий не скрытый ИЛИ сотрудник админ */
+						
+						$queryUserData .= " u.id=".$messageParent["user_link"];
+						$userData = $db->fetchAssoc($queryUserData,true);
+							
+						if((!$isPrivate) || ($userData["priority"] == 3)){
+						
+							$display .= 'dataMessage.note = "Новый комментарий на ваш комментарий";';
+							$display .= 'oSender.sendToAuthorTicketComment(dataMessage,completeSend);';
+							
+						}
+					}
+				}
+				
 				if($message['applicant']==$user['uid']){
 					/* оставил коммент - заявитель (хоть админ он хоть не админ) */
 					/* оповестим Ответственного - если назначен ответстыенный на заявку */
