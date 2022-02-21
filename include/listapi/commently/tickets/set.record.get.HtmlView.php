@@ -226,6 +226,12 @@ try{
 		
 		$display .= 'dataMessage.nrequest = '.$nRecord.';';
 		
+		/*  */
+		$title = str_replace('"','\'',$title);
+		$comment = str_replace('"','\'',$comment);
+		/* иначе, на выходе из pho будет нечто вроде "строка сообщения "а тут ковычки"  " -
+		что на клиенте не сможет быть и6нтерпретирвоано с помощью javascript */
+		
 		$display .= 'dataMessage.description = "';
 		if($title != ''){
 			$display .= $title.'<br />';
