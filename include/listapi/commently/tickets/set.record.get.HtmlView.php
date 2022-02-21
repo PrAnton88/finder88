@@ -172,174 +172,174 @@ try{
 	$display = '';
 	
 	if(!$chunk){ 
-		$display .= '<li class="nothing-here">chunk commentItem is not found!</li>';
-	}else{ 
+		throw new ErrorException("chunk commentItem is not found!");
+	}
 		
-		if($comment != ''){
+	if($comment == ''){
+		throw new ErrorException("arg comment is not found!");
+	}
+			
+	if($nParent == 0){
+		$nParent = ''; 
+	}
 			
 			
-			if($nParent == 0){
-				$nParent = ''; 
-			}
 			
-			// $nRecord, /* номер заявки или номер ресурса */
 			
-			$comment = str_replace("\n","<br/>",$comment);
-			
-			$ashtml = $chunk->process(array(
-				'id' => $nRecord,
-				'nparent' => ($nParent && ( ((int) $nParent) != 0))?1:0,
-				'author' => $user["fio"],
-				'datetime' => $dateReg,
-				'content' => $comment,
-				'title' => $title,
-				'hidden' => $hidden,
-				'ncommon' => $nCommon,
-				'type' => 'tickets',
-				'editable' => 1,
-				'repliedly' => 1
-			));
+	// $nRecord, /* номер заявки или номер ресурса */
+	
+	$comment = str_replace("\n","<br/>",$comment);
+	
+	$ashtml = $chunk->process(array(
+		'id' => $nRecord,
+		'nparent' => ($nParent && ( ((int) $nParent) != 0))?1:0,
+		'author' => $user["fio"],
+		'datetime' => $dateReg,
+		'content' => $comment,
+		'title' => $title,
+		'hidden' => $hidden,
+		'ncommon' => $nCommon,
+		'type' => 'tickets',
+		'editable' => 1,
+		'repliedly' => 1
+	));
 
-			$display .= $ashtml;
-			$display .= '<script>customMess("Комментарий добавлен");';
+	$display .= $ashtml;
+	$display .= '<script>customMess("Комментарий добавлен");';
+	
+	/* и оповещения */
+	
+	
+	
+	/* если родитель комментария был скрытым комментарием */
+	/* и мы знаем что как скрытый комментарий, так и его потомков пользователь заявок не должен видеть */
+	/* тогда, на комментарий, родитель которого был скрыт - мы не оповещаем инициатора заявки */
+	/* поэтому, если комментарий не скрыт, и есть родитель, то
+	инеративно выбираем родителей - до корня комментариев, или до ммоента, когда один из предков точно был скрытым
+	выбираем данные родителя комментария, что бы узнать был ли он скрыт */
+	
+	
+	$isPrivate = false;
+	if(($hidden != 0) || (($hidden == 0) && ((int)$nParent > 0) && checkPrivateParentComment($nParent))){
+		$isPrivate = true;
+	}
+	
+	$display .= '(function(){';
+		$display .= 'let completeSend = function (){ customMess("Сообщение отправлено"); };';
+		$display .= 'let dataMessage = {};';
+		
+		$display .= 'dataMessage.nrequest = '.$nRecord.';';
+		
+		$display .= 'dataMessage.description = "';
+		if($title != ''){
+			$display .= $title.'<br />';
+		}
+		$display .= $comment.'";';
+		$display .= 'dataMessage.subject = "new Comment";';
+		
+		/*
+		$ashtml = (string)$ashtml;
+		$ashtml = str_replace("\n","",$ashtml);
+		$ashtml = str_replace("//","\/\/",$ashtml);//for url
+		$ashtml = str_replace('"',"'",$ashtml);
+		$ashtml = str_replace('\t','',$ashtml);
+		$ashtml = str_replace('&','ampersand',$ashtml);//for url
+		$display .= 'dataMessage.ashtml = "'.$ashtml.'";';
+		*/
+		
+		
+		$display .= 'let oSender = oBaseAPI.message.email;';
+		
+		if($nParent != ''){
+			/* заявитель и / или инициатор так и так будут оповещены (см ниже) */
+			/* теперь выберем данные о пользователе который сделал родительский комментарий */
+			/* и если родительский комментарий не от заявителя и не от инициатора */
+			/* то оповестим ещё и его */
+			$query = "SELECT user_link FROM comments WHERE id = $nParent";
 			
-			/* и оповещения */
-			
-			
-			
-			/* если родитель комментария был скрытым комментарием */
-			/* и мы знаем что как скрытый комментарий, так и его потомков пользователь заявок не должен видеть */
-			/* тогда, на комментарий, родитель которого был скрыт - мы не оповещаем инициатора заявки */
-			/* поэтому, если комментарий не скрыт, и есть родитель, то
-			инеративно выбираем родителей - до корня комментариев, или до ммоента, когда один из предков точно был скрытым
-			выбираем данные родителя комментария, что бы узнать был ли он скрыт */
-			
-			
-			$isPrivate = false;
-			if(($hidden != 0) || (($hidden == 0) && ((int)$nParent > 0) && checkPrivateParentComment($nParent))){
-				$isPrivate = true;
+			$messageParent = $db->fetchFirst($query,true);
+			if( is_string($messageParent) && (strpos($messageParent,"error") !== false)){
+				throw new ErrorException("SQL for get record ticket has failed");
 			}
 			
-			$display .= '(function(){';
-				$display .= 'let completeSend = function (){ customMess("Сообщение отправлено"); };';
-				$display .= 'let dataMessage = {};';
+			if(
+				($messageParent["user_link"] != $user['uid']) &&
+				($messageParent["user_link"] != $message['applicant']) &&
+				( ($message['assd'] == '') || ($messageParent["user_link"] != $message['assd']) )
+			){
 				
-				$display .= 'dataMessage.nrequest = '.$nRecord.';';
+				/* необходимо узнать и права того сотрудника */
+				/* отправляем если
+				комментарий не скрытый ИЛИ сотрудник админ */
 				
-				$display .= 'dataMessage.description = "';
-				if($title != ''){
-					$display .= $title.'<br />';
+				$queryUserData .= " u.id=".$messageParent["user_link"];
+				$userData = $db->fetchAssoc($queryUserData,true);
+					
+				if((!$isPrivate) || ($userData["priority"] == 3)){
+				
+					$display .= 'dataMessage.note = "Новый комментарий на ваш комментарий";';
+					$display .= 'oSender.sendToAuthorTicketComment(dataMessage,completeSend);';
+					
 				}
-				$display .= $comment.'";';
-				$display .= 'dataMessage.subject = "new Comment";';
-				
-				/*
-				$ashtml = (string)$ashtml;
-				$ashtml = str_replace("\n","",$ashtml);
-				$ashtml = str_replace("//","\/\/",$ashtml);//for url
-				$ashtml = str_replace('"',"'",$ashtml);
-				$ashtml = str_replace('\t','',$ashtml);
-				$ashtml = str_replace('&','ampersand',$ashtml);//for url
-				$display .= 'dataMessage.ashtml = "'.$ashtml.'";';
-				*/
-				
-				
-				$display .= 'let oSender = oBaseAPI.message.email;';
-				
-				if($nParent != ''){
-					/* заявитель и / или инициатор так и так будут оповещены (см ниже) */
-					/* теперь выберем данные о пользователе который сделал родительский комментарий */
-					/* и если родительский комментарий не от заявителя и не от инициатора */
-					/* то оповестим ещё и его */
-					$query = "SELECT user_link FROM comments WHERE id = $nParent";
-					
-					$messageParent = $db->fetchFirst($query,true);
-					if( is_string($messageParent) && (strpos($messageParent,"error") !== false)){
-						throw new ErrorException("SQL for get record ticket has failed");
-					}
-					
-					if(
-						($messageParent["user_link"] != $user['uid']) &&
-						($messageParent["user_link"] != $message['applicant']) &&
-						( ($message['assd'] == '') || ($messageParent["user_link"] != $message['assd']) )
-					){
-						
-						/* необходимо узнать и права того сотрудника */
-						/* отправляем если
-						комментарий не скрытый ИЛИ сотрудник админ */
-						
-						$queryUserData .= " u.id=".$messageParent["user_link"];
-						$userData = $db->fetchAssoc($queryUserData,true);
-							
-						if((!$isPrivate) || ($userData["priority"] == 3)){
-						
-							$display .= 'dataMessage.note = "Новый комментарий на ваш комментарий";';
-							$display .= 'oSender.sendToAuthorTicketComment(dataMessage,completeSend);';
-							
-						}
-					}
-				}
-				
-				if($message['applicant']==$user['uid']){
-					/* оставил коммент - заявитель (хоть админ он хоть не админ) */
-					/* оповестим Ответственного - если назначен ответстыенный на заявку */
-					
-					if($message['assd'] != ''){
-						
-						$display .= 'dataMessage.note = "Оповещение ответственному";';
-						$display .= 'oSender.sendToAssdTickets';
-						
-					}else{
-						
-						$display .= 'dataMessage.note = "Оповещение инициатору - Ответственный на вашу заявку ещё не назначен";';
-						$display .= 'oSender.sendToApplicantTickets';
-						
-					}
-				}elseif($admin != 0){
-					/* оставил коммент кто то из админов - возможно ответственный, или любой другой */
-					
-					
-					if($message['assd']==$user['uid']){
-						/* Ответственный на заявку */
-						
-						/* если коммент не приватен и заявитель не админ */
-						/* или заявитель админ */
-						
-						if(($message['applicantPrior'] == 3) || ((!$isPrivate) && ($message['applicantPrior'] != 3))){
-							/* оповестим заявителя */
-							$display .= 'dataMessage.note = "Оповещение заявителю";';
-							
-							$display .= 'oSender.sendToApplicantTickets';
-							
-							
-						}
-					}else{
-						/* "Сторонняя помощь" */
-						/* 1. оповестим ответственного (как минимум ответственный должен быть с правами админа) */
-						/* 2. оповестим заявителя - если коммент не приватен и заявитель не админ или заявитель админ */
-						
-						$display .= 'dataMessage.note = "Оповещение ответственному";';
-						
-						/* 1. оповестим ответственного */
-						$display .= 'oSender.sendToAssdTickets(dataMessage,completeSend);';
-						
-						if(($message['applicantPrior'] == 3) || ((!$isPrivate) && ($message['applicantPrior'] != 3))){
-							/* 2. оповестим заявителя */
-							$display .= 'dataMessage.note = "Оповещение заявителю";';
-							
-							$display .= 'oSender.sendToApplicantTickets';
-						}
-					}
-				}
-				$display .= '(dataMessage,completeSend);';
-			
-			$display .= '})();';
-			$display .= '</script>';
-		}else{
-			$display .= '<li class="nothing-here">arg comment is not found!</li>';
+			}
 		}
 		
-	}
+		if($message['applicant']==$user['uid']){
+			/* оставил коммент - заявитель (хоть админ он хоть не админ) */
+			/* оповестим Ответственного - если назначен ответстыенный на заявку */
+			
+			if($message['assd'] != ''){
+				
+				$display .= 'dataMessage.note = "Оповещение ответственному";';
+				$display .= 'oSender.sendToAssdTickets';
+				
+			}else{
+				
+				$display .= 'dataMessage.note = "Оповещение инициатору - Ответственный на вашу заявку ещё не назначен";';
+				$display .= 'oSender.sendToApplicantTickets';
+				
+			}
+		}elseif($admin != 0){
+			/* оставил коммент кто то из админов - возможно ответственный, или любой другой */
+			
+			
+			if($message['assd']==$user['uid']){
+				/* Ответственный на заявку */
+				
+				/* если коммент не приватен и заявитель не админ */
+				/* или заявитель админ */
+				
+				if(($message['applicantPrior'] == 3) || ((!$isPrivate) && ($message['applicantPrior'] != 3))){
+					/* оповестим заявителя */
+					$display .= 'dataMessage.note = "Оповещение заявителю";';
+					
+					$display .= 'oSender.sendToApplicantTickets';
+					
+					
+				}
+			}else{
+				/* "Сторонняя помощь" */
+				/* 1. оповестим ответственного (как минимум ответственный должен быть с правами админа) */
+				/* 2. оповестим заявителя - если коммент не приватен и заявитель не админ или заявитель админ */
+				
+				$display .= 'dataMessage.note = "Оповещение ответственному";';
+				
+				/* 1. оповестим ответственного */
+				$display .= 'oSender.sendToAssdTickets(dataMessage,completeSend);';
+				
+				if(($message['applicantPrior'] == 3) || ((!$isPrivate) && ($message['applicantPrior'] != 3))){
+					/* 2. оповестим заявителя */
+					$display .= 'dataMessage.note = "Оповещение заявителю";';
+					
+					$display .= 'oSender.sendToApplicantTickets';
+				}
+			}
+		}
+		$display .= '(dataMessage,completeSend);';
+	
+	$display .= '})();';
+	$display .= '</script>';
+	
 	
 	echo $display;
 	
