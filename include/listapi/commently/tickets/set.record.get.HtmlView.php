@@ -142,7 +142,9 @@ try{
 		header("HTTP/1.1 403 Forbidden"); exit; /* доступ запрещен */
 	}
 	
-	
+	if($comment == ''){
+		throw new ErrorException("arg comment is not found!");
+	}
 	
 	
 	$dateReg = date("Y-m-d H:i:s");
@@ -174,16 +176,10 @@ try{
 	if(!$chunk){ 
 		throw new ErrorException("chunk commentItem is not found!");
 	}
-		
-	if($comment == ''){
-		throw new ErrorException("arg comment is not found!");
-	}
 			
 	if($nParent == 0){
 		$nParent = ''; 
 	}
-			
-			
 			
 			
 	// $nRecord, /* номер заявки или номер ресурса */
