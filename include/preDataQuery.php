@@ -11,8 +11,10 @@
 	$roomsQuery = "SELECT id, name FROM cabinet";
 	
 	
-	
+	/* unknown use */
 	$userfields = array('fio', 'otdel', 'company', 'dept', 'prof', 'net_name', 'invent_num', 'ip', 'mac', 'login', 'email', 'regdate', 'nroom', 'int_phone', 'ext_phone', 'icq');
+
+	/* use */
 	$states = array("Открыта", "Принята", "Выполнена");
 	$priors = array('Низкий', 'Средний', 'Высокий', 'Критично');
 	$months = array('января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря', );
