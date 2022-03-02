@@ -52,7 +52,7 @@ try{
 		
 		/* if(!sendEmail($itemMail,$subject,$message)){ */
 		if(!sendMessage($db,$itemMail,$subject,false/*$n*/,$message/*,$sendCom=false*/)){
-			throw new ErrorException("—ообщение '$subject' не отправлено");
+			throw new ErrorException("Сообщение '$subject' не отправлено");
 		}
 	}
 

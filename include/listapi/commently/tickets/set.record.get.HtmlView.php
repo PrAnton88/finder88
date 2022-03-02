@@ -297,7 +297,8 @@ try{
 				
 			}else{
 				
-				$display .= 'dataMessage.note = "Оповещение инициатору - Ответственный на вашу заявку ещё не назначен";';
+				// $display .= 'dataMessage.note = "Оповещение инициатору - Ответственный на вашу заявку ещё не назначен";';
+				$display .= 'dataMessage.note = "Оповещение инициатору. Новый комментарий. ";';
 				$display .= 'oSender.sendToApplicantTickets';
 				
 			}
