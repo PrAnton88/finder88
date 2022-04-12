@@ -233,6 +233,8 @@ try{
 		if(count($checkedDevices) > 0){
 			
 			
+			$query = "UPDATE bronedevicecomplete set listdevice='".addslashes($listdevice)."' WHERE id=$nRecord";
+			
 			if($note !== ''){
 			
 				$insertId = $db->insert("bronedevicenotes", 
@@ -240,15 +242,17 @@ try{
 					array('note'=>$note)
 				);
 				
+				/* !!! НО, в $listdevice только текст */
+				$query = "UPDATE bronedevicecomplete set listdevice='".addslashes($listdevice)."', note=$insertId WHERE id=$nRecord";
+				
 			}
 			
 			
-			/* !!! НО, в $listdevice только текст */
-			$query = "UPDATE bronedevicecomplete set listdevice='".addslashes($listdevice)."', note=$insertId WHERE id=$nRecord";
+			
 			
 			$resultUpd = $db->query($query, $uid);
 			if( is_string($resultUpd) && (strpos($resultUpd,"error") !== false)){
-				throw new ErrorException("SQL Error. updating request data has failed. $resultUpd");
+				throw new ErrorException("SQL Error");
 				exit;
 			}
 			

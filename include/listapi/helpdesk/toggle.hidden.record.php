@@ -61,7 +61,7 @@ try{
 	
 
 	header("HTTP/1.1 200 Ok");
-	$display .= '{"success":1}';
+	$display = '{"success":1}';
 	
 	
 	echo $display;

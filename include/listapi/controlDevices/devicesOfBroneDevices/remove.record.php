@@ -22,7 +22,7 @@ try{
 	}
 	
 	if($resolution){
-		$resolution = checkUserLaws('admintoBroneDevice');
+		$resolution = checkUserLaws('adminBroneDevice');
 	}
 	
 	if(!$resolution){
@@ -82,6 +82,7 @@ try{
 	if(is_string($result) && (strpos($result,'error') !== false)){
 		throw new ErrorException('sql error');
 	}
+	
 	$c = 0;
 	foreach($result as &$device){
 		if($device['name'] != $editRecord['name']){
@@ -92,9 +93,19 @@ try{
 		$c ++;
 	}
 	
+	/* ТАК КАК В ПРЕДЫДУЩЕМ ПРИМЕРЕ В ПЕРЕМЕННОЙ device */
+	/* БЫЛА ССЫЛКА */
+	/* ТО В СЛЕДУЮЩЕМ ЦИКРЕ ($result as anyItem) */
+	/* НЕ ИСПОЛЬЗУЙТЕ В КАЧЕСТВЕ anyItem ПЕРЕМЕННУЮ $device */
+	/* ВОЗЬМИТЕ ЛЮБУЮ ДРУГУЮ ПЕРЕМЕННУЮ */
+	/* ЛИБО ЗАНОВО ВОЗЬМИТЕ $device ЧЕРЕЗ ССЫЛКУ & */
+	
+	// print_r($device);
+	// print_r($result);
 	
 	/* идти по записям и ставить hidden = 1 */
-	foreach($result as $device){
+	foreach($result as &$device){
+		
 		removeRecord($db,$device['id']);
 	}
 	

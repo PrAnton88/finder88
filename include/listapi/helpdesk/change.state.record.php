@@ -93,6 +93,8 @@ try{
 			$state = 0;
 		}
 	}
+	
+	
 	if((int)$existmess["priority"] != $priority){
 		$existmess["priority"] = $priority;
 		$dataOutput["priority"] = $priority;

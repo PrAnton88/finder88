@@ -19,21 +19,19 @@ try{
 
 
 	/* права пользователя */
-   	$query = getQueryUserLaws($db);
-	$query .= " WHERE u.role = ".$uid;
-	$dataLawsOfUser = $db->fetchFirst($query);
-   	$smarty->assign("dataLawsOfUser",$dataLawsOfUser);
+ 
 
 
 	$smarty->assign("admin",($user['priority'] & 2));
 
-	$smarty->assign("tpl_name",'settinglaw');
 
-
+	$smarty -> assign("applicantFI",$user["fi"]);
+    $smarty -> assign("adminSettingLaw",checkUserLaws('adminSettingLaw'));
+	$smarty -> assign("adminConversation",checkUserLaws('adminConversation'));
+	$smarty -> assign("adminBroneDevice",checkUserLaws('adminBroneDevice'));
 	
 	
-	
-	return $smarty->display('../default/lmenu.tpl');
+	return $smarty->display('../default/profilePoint.tpl');
 	
 }catch(ErrorException $ex){
 	/*

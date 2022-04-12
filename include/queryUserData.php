@@ -19,7 +19,7 @@ FROM users as u, role as r,
 	}
 	/* можно ли так делать, ведь uid должен быть ролью а id = user.id */
 	/* возможны последствия при переделывании */
-	$queryUserData = "SELECT u.id as uid, r.id, u.role, r.priority, u.post 'prof', concat_ws(' ', u.last_name, u.first_name, u.patronymic) 'fio', u.int_phone, u.ext_phone, u.role, u.hidden 'dis', c.name as 'company', p.dept 'otdel', d.name as 'dept', k.name as 'nroom', r.login, r.email,
+	$queryUserData = "SELECT u.id as uid, r.id, u.role, r.priority, u.post 'prof', concat_ws(' ', u.last_name, u.first_name, u.patronymic) 'fio', concat_ws(' ', u.last_name, u.first_name) 'fi', u.int_phone, u.ext_phone, u.role, u.hidden 'dis', c.name as 'company', p.dept 'otdel', d.name as 'dept', k.name as 'nroom', r.login, r.login as 'slogin', r.email,
 opt.mop, opt.uop, opt.pop, opt.updateTechnicalSupport as 'updateTechnicalPage'
 FROM users as u, role as r, user_options as opt,
 		place1 as p LEFT OUTER JOIN dept d on d.id = p.dept

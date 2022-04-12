@@ -72,11 +72,14 @@ try{
 	$display = '';
 	if(($existmess["user_link"] == $user["uid"]) || (($existmess["user_link"] == '') && ($user['priority'] == 3))){
 	
-		$display .= $smarty->display('../default/components/tmp.htmlState.tpl');
+		$smarty->assign('nres',$nrequest);
+		$smarty->assign('nassd',$existmess["user_link"]);
+	
+		$display .= $smarty->display('../default/components/tmp.htmlListState-min.tpl');
 	}else{
 		
 		$smarty->assign("state",$existmess['state']);
-		$display .= $smarty->display('../default/components/tmp.test.tpl');
+		$display .= $smarty->display('../default/components/tmp.infoState.tpl');
 	}
 	
 	
@@ -95,8 +98,13 @@ try{
 	$commonMessage = ('<br /> №'.$existmess["id"].' \"'.$existmess["header"].'\"<br />');
 	/* $display .= 'customMess("'.$nassd.' '.$existmess["user_link"].'");'; */
 	
+	
+	/* $nassd - предыдущий ответственный */
+	/* $nstate - новый статус */
+	
 	if($nstate == $existmess["state"]){
 		/* статус не изменен */
+		
 		if($nassd != $existmess["user_link"]){
 			/* изменен Ответственный */
 			
@@ -104,28 +112,41 @@ try{
 			/* 2. ответственному о том что он теперь ответственный на эту заявку */
 			/* 3. бывшему ответственному о том что он теперь НЕ ответственный на эту заявку */
 			
-			/* 1. */
-			$display .= 'dataMessage.note = "Оповещение заявителю - изменен ответственный";';
-			$display .= 'dataMessage.description = "Назначен ДРУГОЙ ответственный на вашу заявку '.$commonMessage.'";';
-			$display .= 'oSender.sendToApplicantTickets(dataMessage,completeSend);';
 			
 			
-			/* 2. */
-			$display .= 'dataMessage.note = "Оповещение ответственному";';
-			$display .= 'dataMessage.description = "Вы назначемы ответственным на выполнение заявки '.$commonMessage.'";';
-			$display .= 'oSender.sendToAssdTickets(dataMessage,completeSend);';
+			if((int)$existmess["user_link"] != 0){
+				/* неважно то какой был ответственный - но если сейчас 0, то уже нет ответственно */
+				
+				if($nassd != 0){
+					/* 1. */
+					$display .= 'dataMessage.note = "Оповещение заявителю - изменен ответственный";';
+					$display .= 'dataMessage.description = "Назначен ДРУГОЙ ответственный на вашу заявку '.$commonMessage.'";';
+					$display .= 'oSender.sendToApplicantTickets(dataMessage,completeSend);';
+				}
+				
+				
+				
+				/* 2. */
+				$display .= 'dataMessage.note = "Оповещение ответственному";';
+				$display .= 'dataMessage.description = "Вы назначемы ответственным на выполнение заявки '.$commonMessage.'";';
+				$display .= 'oSender.sendToAssdTickets(dataMessage,completeSend);';
 			
 			
-			/* 3. */
-			$display .= 'dataMessage.note = "Оповещение ответственному - о снятии с заявки";';
-			$display .= 'dataMessage.description = "Вы больше НЕ назначемы ответственным на выполнение заявки '.$commonMessage.'";';
-			$queryUserData .= ' u.id='.$nassd;
-		
-			$userData = $db->fetchFirst($queryUserData,$uid);
-			if(is_string($userData) && (strpos($userData,'error')!== false)){
-				throw new ErrorException('SQL Error');
+			
+				/* 3. */
+				$display .= 'dataMessage.note = "Оповещение ответственному - о снятии с заявки";';
+				$display .= 'dataMessage.description = "Вы больше НЕ назначемы ответственным на выполнение заявки '.$commonMessage.'";';
+				
+				
+				$queryUserData .= ' u.id='.$nassd;
+			
+				$userData = $db->fetchFirst($queryUserData,$uid);
+				if(is_string($userData) && (strpos($userData,'error')!== false)){
+					throw new ErrorException('SQL Error');
+				}
+				
+				$display .= 'oSender.sendToAnyUser(dataMessage,[{email:"'.$userData['email'].'"}],completeSend);';
 			}
-			$display .= 'oSender.sendToAnyUser(dataMessage,[{email:"'.$userData['email'].'"}],completeSend);';
 			
 		}else{
 			if($existmess["state"] == 2){

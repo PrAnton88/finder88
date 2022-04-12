@@ -11,7 +11,7 @@ header('Content-type:application/json');
 try{
 
 	if($resolution){
-		$resolution = checkUserLaws('admintoBroneDevice');
+		$resolution = checkUserLaws('adminBroneDevice');
 	}
 	
 	if(!$resolution){
@@ -28,12 +28,16 @@ try{
 	$dataRecord = json_decode($dataRecord,true);
 	
 	
-	if(!isset($dataRecord['type'])){
+	
+	$type = false;
+	if(isset($dataRecord['type'])){
+		$type = (int) $dataRecord['type'];
+	}else{
 		throw new ErrorException("arg type is not found");
 	}
-	$type = $dataRecord['type'];
-	if($type == ''){
-		throw new ErrorException("arg type is empty");
+	
+	if((!$type) || ($type == 0)){
+		throw new ErrorException("arg type is invalid");
 	}
 	
 	
@@ -48,6 +52,8 @@ try{
 	
 	/* если количество увеличилось - то добавляем записи */
 	
+	
+	$newType = false;
 	
 	if($nRecord === false){
 		// нов
@@ -78,6 +84,10 @@ try{
 			throw new ErrorException('sql error');
 		}
 		
+		/* узнать изменился ли тип !!!! */
+		if($editRecord['type'] != $type){
+			$newType = true;
+		}
 		
 		if(count($editRecord) == 0){
 			throw new ErrorException('Редактируемый элемент не найден');
@@ -169,10 +179,10 @@ try{
 				for($i = 0; $i < ($dataRecord['count'] - count($resultOfBusy)); $i++){
 					
 					
-					$resultUpd = $db->update('bronedevicename', array(), $dataRecord, "id=".$resultOfFree[$i]['id']);
+					/*$resultUpd = $db->update('bronedevicename', array(), $dataRecord, "id=".$resultOfFree[$i]['id']);
 					if( is_string($resultUpd) && (strpos($resultUpd,"error") !== false) ){
 						throw new ErrorException("SQL Error");
-					}
+					}*/
 					
 					
 					unset($resultOfFree[$i]);
@@ -192,14 +202,15 @@ try{
 				}
 				
 				/* а теперь обновить информацию в устройствах которые заняты */
-				foreach($resultOfBusy as $item){
+				/*foreach($resultOfBusy as $item){
 					$resultUpd = $db->update('bronedevicename', array(), $dataRecord, "id=".$item['id']);
 					if( is_string($resultUpd) && (strpos($resultUpd,"error") !== false)){
 						throw new ErrorException("SQL Error");
 					}
-				}
+				}*/
 				
 			}else{
+				/* count >= */
 				
 				for($i = ($dataRecord['count'] - $editRecord['count']); $i > 0; $i--){
 					/* количество увеличилось */
@@ -215,14 +226,14 @@ try{
 				
 				/* как на счёт того что бы обновить информацию в уже имеющихся записях */
 				/* по $resultOfBusy и по $resultOfFree */
-				foreach(array_merge($resultOfFree,$resultOfBusy) as $item){
+				/*foreach(array_merge($resultOfFree,$resultOfBusy) as $item){
 					
 					$resultUpd = $db->update('bronedevicename', array(), $dataRecord, "id=".$item['id']);
 					if( is_string($resultUpd) && (strpos($resultUpd,"error") !== false)){
 						throw new ErrorException("SQL Error");
 					}
 					
-				}
+				}*/
 				
 				
 				
@@ -232,13 +243,20 @@ try{
 			
 			
 			
-		}else{
+		}
+		
+		/* только если тип не изменился !!! */
+		
+		if($newType){
+			$type = $editRecord['type'];
+		}
 			
-			$resultUpd = $db->update('bronedevicename', array(), $dataRecord, "id=$nRecord");
-			if( is_string($resultUpd) && (strpos($resultUpd,"error") !== false)){
-				throw new ErrorException("SQL Error");
-			}
-			
+		$dataRecord['id'] = null;
+		unset($dataRecord['id']);
+		
+		$resultUpd = $db->update('bronedevicename', array(), $dataRecord, "type=$type AND name='".$editRecord['name']."'");
+		if( is_string($resultUpd) && (strpos($resultUpd,"error") !== false)){
+			throw new ErrorException("SQL Error $resultUpd");
 		}
 		
 		

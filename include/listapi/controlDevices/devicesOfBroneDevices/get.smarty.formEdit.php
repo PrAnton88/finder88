@@ -10,7 +10,7 @@ header('Content-type:text/html');
 try{
 	
 	if($resolution){
-		$resolution = checkUserLaws('admintoBroneDevice');
+		$resolution = checkUserLaws('adminBroneDevice');
 	}
 	
 	if(!$resolution){

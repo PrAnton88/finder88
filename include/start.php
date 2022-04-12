@@ -24,8 +24,10 @@
 				$serv = $_SERVER['HTTP_HOST'];
 			
 				fwrite($log, 
-					"\t".date("d-m-Y H:i:s").'	|| '.(function_exists('fgetBrovser')?fgetBrovser():'----').'	|ip: ' .$ip.'   |serv = '.$serv."\r\n".str_replace("&amp;","&",$_SERVER['REQUEST_URI'])."\r\n".
-					($mess?($mess):"")."\r\n\r\n"
+					"\t".date("d-m-Y H:i:s").'	|| '.(function_exists('fgetBrovser')?fgetBrovser():'----').'	|ip: ' .$ip.'   |serv = '.$serv."\r\n".
+					/* $_SERVER['DOCUMENT_ROOT']."\r\n". */
+					str_replace("&amp;","&",$_SERVER['REQUEST_URI'])."\r\n".
+					($mess?($mess):"")." \r\n\r\n"
 				);
 				
 				fclose($log);
@@ -148,8 +150,14 @@
 				
 			}
 			
+			$messLog = "===============================================================\r\n";
+			/* добавить рандомное число переносов строк */
+			$k = rand(1,5);
+			for($i = 0; $i<$k; $i++){
+				$messLog .= "\r\n";
+			}
 			
-			fwriteLog('===============================================================');
+			fwriteLog($messLog);
 			
 		}
 		// при отсутствии getUserAuthData, $resolution может установиться в зн-е false только при несоответствии селектору

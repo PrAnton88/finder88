@@ -11,7 +11,7 @@ header('Content-type:application/json');
 try{
 	
 	if($resolution){
-		$resolution = checkUserLaws('admintoBroneDevice');
+		$resolution = checkUserLaws('adminBroneDevice');
 	}
 	
 	if(!$resolution){

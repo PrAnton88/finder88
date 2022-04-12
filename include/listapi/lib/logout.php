@@ -18,7 +18,7 @@ try{
 	session_destroy();
 	$_COOKIE[CSESSID] = '';
 	//setcookie('csessid');
-	setcookie(CSESSID, "", time() - 3600, '/');
+	setcookie(CSESSID, "", time() - 3600);
 	
 	
 	if(isset($_SESSION[SSESSID]) and ($_SESSION[SSESSID] != "")){

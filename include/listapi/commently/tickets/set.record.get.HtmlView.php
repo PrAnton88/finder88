@@ -126,11 +126,15 @@ try{
 		throw new ErrorException("SQL for get record ticket has failed");
 	}
 	
-	
-	
 	if(is_array($message) && (count($message)==0)){
 		throw new ErrorException("ticket for create record comment is not found");
 	}
+	
+	if($message['hidden'] == 1){
+		throw new ErrorException("Нельзя комментировать удаленную заявку");
+	}
+	
+	
 	$admin = ($user['priority'] == 3);
 	
 	if(($message['applicant']!=$user['uid']) && ($admin == 0)){

@@ -6,13 +6,13 @@
 		$sess = $_SESSION[SSESSID];
 		
 		// echo " sess = $sess ";
-		fwriteLog('Сессия обнаружена');
+		fwriteLog('Сессия обнаружена '.$sess);
 		
 	}elseif(isset($_COOKIE[CSESSID]) and ($_COOKIE[CSESSID] != "")){
 		$sess = $_COOKIE[CSESSID];
 		/*то выбрать sid по $_COOKIE[CSESSID]*/
 		
-		fwriteLog('Куки обнаружены');
+		fwriteLog('Куки обнаружены '.$sess);
 		// echo " sess = $sess ";
 		$query = "SELECT sid FROM sessions WHERE id = '$sess'";
 		if($db){
@@ -29,7 +29,7 @@
 				/* вероятно стоит создать сессию, раз её не было? */
 				
 				$_SESSION[SSESSID] = $sess;
-				fwriteLog('Создана Сесссия по обнаруженым Кукам');
+				fwriteLog('Создана Сесссия '.$sess.' по обнаруженым Кукам');
 				
 			}else{
 				/* $sess = false; */

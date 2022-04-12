@@ -83,32 +83,37 @@ try{
 				$i++;
 			}
 			
+			$reData = [];
+			
 			/* теперь идём по массиву устройсив в каждом из заказов */
-			/* и если идентификаторы устройств совпадают - увеличиваем count и убираем одру запись */
+			/* и если идентификаторы устройств совпадают - увеличиваем count и убираем одну запись */
 			$i = 0;
 			foreach($tikets as &$tiket){
 				$n = 0;
-				foreach($tiket['data'] as &$device){
 				
-					if($n > 0){
-						if($device['name'] === $tiket['data'][$n-1]['name']){
-							
-							$tiket['data'][$n-1]['count'] += 1;
+				/* перевернуть элементы массива так, что бы следующий цикл - перебирал с элементы с конца,
+				в таком случае, удаление элементов безвредно */
+				
+				$reData = array_reverse($tiket['data']);
+				
+				foreach($reData as &$device){
+				
+					if(isset($reData[$n+1]['name'])){
+						if($device['name'] === $reData[$n+1]['name']){
+						
+							$reData[$n+1]['count'] += $device['count'];
 							$device = null;
 							
-							unset($tiket['data'][$n]);
+							unset($reData[$n]);
 						}
-						
-						
 					}
+						
 					$n++;
 				}
 				
+				/* взять последний - потому что все остальные удалены */
+				$tiket['data'] = array($reData[$n-1]);
 			}
-			
-			// print_r($tikets);
-			
-			
 			
 			$result = $tikets;
 		}

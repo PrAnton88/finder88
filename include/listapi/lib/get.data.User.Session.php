@@ -33,6 +33,10 @@ try{
 	if(isset($_SESSION[SSESSID]) and ($_SESSION[SSESSID] != "")){
 		$sess = '_SESSION = '.$_SESSION[SSESSID];
 		
+		
+		// print_r($_SESSION);
+		// print_r($_COOKIE);
+		
 	}elseif(isset($_COOKIE[CSESSID]) and ($_COOKIE[CSESSID] != "")){
 		$sess = '_COOKIE = '.$_COOKIE[CSESSID];
 		/*то выбрать sid по $_COOKIE[CSESSID]*/

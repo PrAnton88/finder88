@@ -56,7 +56,7 @@ try{
 	
 	/* нужно взять информацию о правах авторизованного пользователя */
 	// require_once "../../lib/query/get.query.UserLaws.php";
-	$queryLawsThisUser = getQueryToGetUserLaws("l.admintoBroneDevice,l.dispatchToBroneDevice");
+	$queryLawsThisUser = getQueryToGetUserLaws("l.adminBroneDevice,l.dispatchToBroneDevice");
 	$queryLawsThisUser .= " WHERE u.role = ".$uid;
 
 	$dataLaw = $db->fetchFirst($queryLawsThisUser,$uid);

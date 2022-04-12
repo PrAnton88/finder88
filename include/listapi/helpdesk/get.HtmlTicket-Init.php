@@ -69,19 +69,11 @@ try{
 	$smarty->assign("admins",$admins);
 	
 	
-	// echo 'assd = '.$message['assd'];
-	// print_r($admins);
-	// echo $query;
-	// print_r($message);
-	
-	
 	$smarty->assign("admin",($user['priority'] == 3));
 	$smarty->assign("message",$message);
-	$smarty->assign("nres",$nrequest);
-	
 	
 	header("HTTP/1.1 200 Ok");
-	return $smarty->display('../default/components/tmp.htmlActionsTickets-min.tpl');
+	return $smarty->display('../default/components/tmp.htmlActionsTickets.tpl');
 	
 	
 }catch(ErrorException $ex){

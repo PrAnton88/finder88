@@ -1,6 +1,6 @@
 <?php
 
-/* это брат сниппета multiHandComment (133) */
+
 header('Content-type:text/html');
 
 	$getUserAuthData = true;
@@ -13,9 +13,9 @@ try{
 
 	/* use exam
 	
-		dataReqNext({file:urlServerSide+'helpdesk/get.HtmlActionsTickets.php',type:'text',
+		dataReqNext({file:urlServerSide+'helpdesk/get.HtmlnfoAssdTicket.php',type:'text',
 		args:'dataRecord='+JSON.stringify(
-			{nrequest:4434}
+			{nrequest:4486}
 		)},
 		console.log
 		);
@@ -41,7 +41,7 @@ try{
 	// $query = "SELECT * FROM request WHERE id=$nrequest";
 	
 	require_once $path."/lib/query/get.query.ListTickets.php";
-    $query = getQueryToGetTicket()." AND a.id=".$nrequest;
+    $query = getQueryToGetTickets()." WHERE a.id=".$nrequest;
 	
 	
 	$message = $db->fetchFirst($query,true);
@@ -55,10 +55,10 @@ try{
 	
 	
 	
-	require_once $path."../preDataQuery.php";
+	// require_once $path."../preDataQuery.php";
 	
 	
-	$smarty->assign("states",$states);
+	
 	
 	
 	$admins = $db->fetchAssoc($adminsQuery,true);
@@ -66,22 +66,15 @@ try{
 		throw new ErrorException("SQL Error");
 	}
 	
-	$smarty->assign("admins",$admins);
-	
-	
-	// echo 'assd = '.$message['assd'];
-	// print_r($admins);
-	// echo $query;
-	// print_r($message);
+	// $smarty->assign("admins",$admins);
 	
 	
 	$smarty->assign("admin",($user['priority'] == 3));
-	$smarty->assign("message",$message);
-	$smarty->assign("nres",$nrequest);
 	
+	$smarty->assign("message",$message);
 	
 	header("HTTP/1.1 200 Ok");
-	return $smarty->display('../default/components/tmp.htmlActionsTickets-min.tpl');
+	return $smarty->display('../default/components/tmp.HtmlnfoAssdTicket.tpl');
 	
 	
 }catch(ErrorException $ex){

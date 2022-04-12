@@ -47,7 +47,7 @@ try{
 	uid
 	adminConversation] => 0
     [dispatchConversation] => 0
-    [admintoBroneDevice] => 0
+    [adminBroneDevice] => 0
     [dispatchToBroneDevice] => 0
     [adminSectionDocs] */
 	

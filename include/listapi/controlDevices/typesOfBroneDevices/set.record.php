@@ -11,7 +11,7 @@ header('Content-type:application/json');
 try{
 
 	if($resolution){
-		$resolution = checkUserLaws('admintoBroneDevice');
+		$resolution = checkUserLaws('adminBroneDevice');
 	}
 	
 	if(!$resolution){
@@ -45,8 +45,15 @@ try{
 		$nRecord = false;
 	}
 
+	$display = 0;
+	if(isset($dataRecord['display'])){
+		$display = (int)$dataRecord['display'];
+	}
 	
-	
+	$hidden = 0;
+	if(isset($dataRecord['hidden'])){
+		$hidden = (int)$dataRecord['hidden'];
+	}
 	
 	if($nRecord === false){
 		/* нов */
@@ -71,7 +78,7 @@ try{
 			throw new ErrorException("Нет поля nRecord");
 		}
 		
-		$query = "UPDATE bronedevicetype set type='".addslashes($type)."' WHERE id=$nRecord";
+		$query = "UPDATE bronedevicetype set type='".addslashes($type)."', display=$display, hidden=$hidden WHERE id=$nRecord";
 			
 		$resultUpd = $db->query($query, $uid);
 		if( is_string($resultUpd) && (strpos($resultUpd,"error") !== false)){
