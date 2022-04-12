@@ -2,9 +2,9 @@
 
 	function getQueryToGetTickets(){
 		
-		return "SELECT a.id, a.applicant, unix_timestamp(a.opened) as 'opened', a.closed, a.time_sub 'sred',
-    	a.header, a.message, a.state, a.priority 'prior', a.user_link as 'assd', a.type 'ctype',
-    	a.device 'cid', a.auto, a.act, a.hidden, r.email, ra.priority as 'applicantPrior', ra.login as 'slogin', 
+		return "SELECT a.id, a.applicant, unix_timestamp(a.opened) as 'opened', a.closed, a.act, a.time_sub 'sred',
+    	a.header, a.message, a.state, a.priority 'prior', a.user_link as 'assd', a.type 'ctype', 
+    	a.device 'cid', a.auto, a.hidden, r.email, ra.priority as 'applicantPrior', ra.login as 'slogin', 
     	concat_ws(' ', b.last_name, b.first_name, b.patronymic) 'ass', concat_ws(' ', b.last_name, b.first_name) as 'assdShort',
     	b.id 'assid', cabAppl.name 'aroom', b.int_phone 'ainp', b.ext_phone 'aexp',
     	concat_ws(' ', c.last_name, c.first_name, c.patronymic) 'req', c.id 'reqid',
@@ -32,8 +32,9 @@
 	
 	function getQueryToGetTicket(){
 		
-		return "SELECT a.id, a.applicant 'req_id', unix_timestamp(a.opened) as 'opened', a.act,
-		a.closed, a.time_sub 'sred', a.header, a.message, a.state, a.priority 'prior', a.user_link 'assd', a.type 'ctype', a.device 'cid', a.hidden, 
+		return "SELECT a.id, a.applicant 'req_id', unix_timestamp(a.opened) as 'opened', a.closed, a.act, a.time_sub 'sred', 
+		a.header, a.message, a.state, a.priority 'prior', a.user_link 'assd', a.type 'ctype', 
+		a.device 'cid', a.auto, a.hidden, 
 		concat_ws(' ', b.last_name, b.first_name, b.patronymic) 'req',
 		concat_ws(' ', c.last_name, c.first_name, c.patronymic) 'ass',
 		c.int_phone 'int', c.ext_phone 'ext', r.login, e.ip, e.inv_num, d.name as dept, cb.name as cabinet

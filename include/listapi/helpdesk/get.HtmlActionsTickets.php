@@ -49,6 +49,11 @@ try{
 		throw new ErrorException("SQL Error"); exit;
 	}
 	
+	if(count($message) == 0){
+		
+		throw new ErrorException('Информация о заявке не найдена');
+	}
+	
 	require_once "$path../config.modx.php";
 	require_once "$path../config.smarty.php";
 	$modx->smarty = $smarty;
@@ -72,7 +77,8 @@ try{
 	// echo 'assd = '.$message['assd'];
 	// print_r($admins);
 	// echo $query;
-	// print_r($message);
+	
+	print_r($message);
 	
 	
 	$smarty->assign("admin",($user['priority'] == 3));

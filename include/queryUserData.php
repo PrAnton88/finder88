@@ -60,10 +60,6 @@ FROM users as u RIGHT JOIN frontend as f ON f.id = u.id, role as r
 	
 	function getUserDataForInsideSnipetHelpdesk(){
 		
-		/* потому что нельзя брать из сниппетов modx ни переменные $queryUserData так же недоступно глобальные переменные $queryUserData */
-		/* возможно нужно делать через return. Но хотя бы доступны эти функции. */
-		/* итого $queryUserData : */
-		
 		return "SELECT u.id as uid, r.id, u.role, r.priority, u.post 'prof', concat_ws(' ', u.last_name, u.first_name, u.patronymic) 'fio', u.int_phone, u.ext_phone, u.role, u.hidden 'dis', c.name as 'company', p.dept 'otdel', d.name as 'dept', k.name as 'nroom', r.login, r.email,
 opt.mop, opt.uop, opt.pop, opt.updateTechnicalSupport as 'updateTechnicalPage'
 FROM users as u, role as r, user_options as opt,
