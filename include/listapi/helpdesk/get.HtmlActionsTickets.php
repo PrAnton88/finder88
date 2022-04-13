@@ -78,9 +78,10 @@ try{
 	// print_r($admins);
 	// echo $query;
 	
-	print_r($message);
+	// print_r($message);
 	
 	
+	$smarty->assign("uid",$user['id']);
 	$smarty->assign("admin",($user['priority'] == 3));
 	$smarty->assign("message",$message);
 	$smarty->assign("nres",$nrequest);

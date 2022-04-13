@@ -4,7 +4,13 @@
 	
 	$companiseQuery = "SELECT * FROM companies WHERE hidden=0 AND name NOT LIKE '%Все организации%' ORDER By name";
 	
-	$adminsQuery = "SELECT a.id, a.post as prof, a.last_name, a.first_name, a.patronymic, concat_ws(' ',a.last_name, a.first_name, a.patronymic) as fio, a.role as ws_link, a.date_role, a.place, a.int_phone, a.ext_phone, a.date_reg FROM users as a LEFT JOIN place1 as b ON a.place = b.id WHERE b.group1 = 36 AND a.hidden=0 AND a.id<>0 ORDER by first_name";
+	$adminsQuery = "SELECT a.id, a.post as prof, a.last_name, a.first_name, a.patronymic, concat_ws(' ',a.last_name, a.first_name, a.patronymic) as fio, a.role as ws_link, a.date_role, a.place, a.int_phone, a.ext_phone, a.date_reg FROM users as a LEFT JOIN place1 as b ON a.place = b.id WHERE b.group1 = 36 AND a.id<>0 ";
+	
+	/* админы */
+	$queryNowAdmins = $adminsQuery ." AND a.hidden=0 ORDER by first_name";
+	
+	/* бывшие админы */
+	$adminsPassQuery = $adminsQuery ." AND a.hidden=1 ORDER by first_name";
 	
 	
 	
