@@ -74,24 +74,42 @@ try{
 	
 	
 	if($type == 'tickets'){
-		$queryComment = "SELECT count(id) as count FROM comments WHERE parent='NULL' AND parent=0 AND request = $nRecord ";
+		$queryComment = "SELECT id,hidden FROM comments WHERE (parent=0 OR (parent IS NULL)) AND request = $nRecord ";
 		
 		if($admin){
 			$queryComment .= " AND hidden < 2 ";
 		}else{
 			$queryComment .= " AND hidden < 1 ";
 		}
+		
+		$comments = $db->fetchAssoc($queryComment,true);
 	}elseif($type == 'posts'){
 		$queryComment = "SELECT count(c.id) as count FROM `commentscommon` as c LEFT JOIN `commentsposts` as p ON p.ncommon = c.id WHERE c.parent=0 AND p.nresource=$nRecord";
+		$comments = $db->fetchFirst($queryComment,true);
 	}
 	
-	$countComment = $db->fetchFirst($queryComment,true);
-	if( is_string($countComment) && (strpos($countComment,"error") !== false)){
+	if( is_string($comments) && (strpos($comments,"error") !== false)){
 		throw new ErrorException("SQL Error");
 	}
 
+	$countComment = 0;
+
+	if($type == 'tickets'){
+		require_once "../lib/commently/fn.getCount.php";
+		
+		foreach($comments as $item){
+			
+			if($admin || ($item['hidden'] == 0)){
+				$countComment += getCount($item['id'],$admin);
+			}
+		}
+	}elseif($type == 'posts'){
+		
+		$countComment = $comments['count'];
+	}
 	
-	echo '{"success":1,"count":"'.$countComment["count"].'"}';
+	
+	echo '{"success":1,"count":"'.$countComment.'"}';
 	
 	header("HTTP/1.1 200 Ok");
 	exit;
