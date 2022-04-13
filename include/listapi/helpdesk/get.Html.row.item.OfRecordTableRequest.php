@@ -14,7 +14,7 @@ try{
 	
 		dataReqNext({file:urlServerSide+'helpdesk/get.Html.row.item.OfRecordTableRequest.php',type:'text',
 		args:'dataRecord='+JSON.stringify(
-			{nrequest:4466}
+			{nrequest:4388}
 		)},
 		console.log
 		);
@@ -59,7 +59,9 @@ try{
 	
 	require_once "../lib/commently/fn.getCount.php";
 	
-    $message['ccomment'] = getCount($nrequest,$admin);
+	$commentsHand = new oCommentsHand($db);
+	
+    $message['ccomment'] = ($commentsHand->getCount($nrequest,$admin));
 
 	
 	require_once "$path../config.modx.php";

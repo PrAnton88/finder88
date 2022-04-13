@@ -19,7 +19,7 @@ try{
 		);
 		
 		dataReqNext({file:urlServerSide+'commently/get.countItems.php',type:'json',args:'dataRecord='+JSON.stringify(
-			{nresource: 4434, type: "tickets"})},function(resultJson){
+			{nresource: 4388, type: "tickets"})},function(resultJson){
 				resultJson = success.check(resultJson);
 				
 				// resultJson.count - содержит найденное количество комментариев
@@ -78,7 +78,9 @@ try{
 		
 		require_once "../lib/commently/fn.getCount.php";
 		
-		$countComment = getCount($nRecord,$admin);
+		$commentsHand = new oCommentsHand($db);
+		
+		$countComment = $commentsHand->getCount($nRecord,$admin);
 		
 	}elseif($type == 'posts'){
 		$queryComment = "SELECT count(c.id) as count FROM `commentscommon` as c LEFT JOIN `commentsposts` as p ON p.ncommon = c.id WHERE c.parent=0 AND p.nresource=$nRecord";
