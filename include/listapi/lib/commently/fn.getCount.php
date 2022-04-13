@@ -1,11 +1,11 @@
 <?php
 
-function getCount(&$id,$admin = false){
+function computeCount(&$parent,$admin = false){
 	
 	$c = 1;
 	global $db;
 	
-	$comments = $db->fetchAssoc("SELECT id, user_link, hidden, parent FROM comments WHERE hidden<".($admin?2:1)." AND parent=$id",true);
+	$comments = $db->fetchAssoc("SELECT id, hidden, parent FROM comments WHERE hidden<".($admin?2:1)." AND parent=$parent",true);
 	if( is_string($comments) && (strpos($comments,"error") !== false) ){
 		throw new ErrorException("SQL for get count comments is invalid");
 	}
@@ -19,10 +19,40 @@ function getCount(&$id,$admin = false){
 	foreach($comments as $item){
 		
 		if($admin || ($item['hidden'] == 0)){
-			$c += getCount($item['id'],$admin);
+			$c += computeCount($item['id'],$admin);
 		}
 	}
 	
 	return $c;
 }
+
+
+function getCount($nRecord,$admin){
+	
+	$countComment = 0;
+	global $db;
+	
+	$queryComment = "SELECT id,hidden FROM comments WHERE (parent=0 OR (parent IS NULL)) AND request = $nRecord ";
+		
+	if($admin){
+		$queryComment .= " AND hidden < 2 ";
+	}else{
+		$queryComment .= " AND hidden < 1 ";
+	}
+	
+	$comments = $db->fetchAssoc($queryComment,true);
+	if( is_string($comments) && (strpos($comments,"error") !== false)){
+		throw new ErrorException("SQL Error");
+	}
+	
+	foreach($comments as $item){
+		
+		if($admin || ($item['hidden'] == 0)){
+			$countComment += computeCount($item['id'],$admin);
+		}
+	}
+	
+	return $countComment;
+}
+
 ?>
