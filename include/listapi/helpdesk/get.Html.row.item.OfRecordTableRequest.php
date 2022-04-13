@@ -53,15 +53,14 @@ try{
 		throw new ErrorException('Информация о заявке не найдена');
 	}
 	
-	
-	$comm = $db->FetchFirst("SELECT COUNT(*) cnt FROM comments WHERE hidden<2 AND request=".$nrequest);
-    if((is_string($comm)) && (strpos($comm,"error") !== false)){
-		throw new ErrorException("SQL Error"); exit;
-	}
-    $message['ccomment']=$comm['cnt'];
+	$admin = ($user['priority'] == 3);
 	
 	
 	
+	require_once "../lib/commently/fn.getCount.php";
+	
+    $message['ccomment'] = getCount($nrequest,$admin);
+
 	
 	require_once "$path../config.modx.php";
 	require_once "$path../config.smarty.php";
@@ -78,7 +77,7 @@ try{
 	
 	
 	$smarty->assign("uid",$user['id']);
-	$smarty->assign("admin",($user['priority'] == 3));
+	$smarty->assign("admin",$admin);
 	$smarty->assign("message",$message);
 	$smarty->assign("nres",$nrequest);
 	
