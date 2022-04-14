@@ -3,6 +3,7 @@
 	define('DEBUG', true);
     define('LINEBREAK', "\r\n");
 	
+	// error_reporting(E_ALL & ~E_USER_WARNING);
 	error_reporting(E_ALL);
 	
 	/* отсюда мы распечатываем и прекращаем дальнейшее выполнение */
@@ -53,7 +54,7 @@
 			$l = error_reporting();
 			
 			if ( $l & $errno ) {
-			   
+			   /* не хочет обрабатывать Warning */
 				$exit = false;
 				switch ( $errno ) {
 					case E_USER_ERROR:
@@ -61,8 +62,11 @@
 						$exit = true;
 					break;
 					case E_USER_WARNING:
+						$type = 'Warning';
+						$exit = true;
 					case E_WARNING:
 						$type = 'Warning';
+						$exit = true;
 					break;
 					case E_USER_NOTICE:
 					case E_NOTICE:
@@ -98,7 +102,7 @@
 	
 	set_error_handler( 'Merror::err_handler' );
 	
-	
+	// set_warning_handler( 'Merror::err_handler' );
     // set_exception_handler( 'exc_handler' );
     
 	

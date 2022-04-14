@@ -54,8 +54,8 @@ FROM users as u RIGHT JOIN frontend as f ON f.id = u.id, role as r
 		*/
 		
 		$query .= $where;
-		return $db->fetchFirst($query,$uid);
 		
+		return $db->fetchFirst($query,$uid);
 	}
 	
 	function getUserDataForInsideSnipetHelpdesk(){
@@ -101,5 +101,6 @@ FROM users as u, role as r, user_options as opt,
 		
 	}
 	
-	
+	/* что бы были доступны глобально, а не только из снипета который подключает этот файл */
+	define(queryUserData,$queryUserData);
 ?>
