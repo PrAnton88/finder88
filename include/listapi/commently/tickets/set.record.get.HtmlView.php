@@ -278,7 +278,7 @@ try{
 				/* отправляем если
 				комментарий не скрытый ИЛИ сотрудник админ */
 				
-				$queryUserData .= " u.id=".$messageParent["user_link"];
+				$queryUserData .= " AND u.id=".$messageParent["user_link"];
 				$userData = $db->fetchAssoc($queryUserData,true);
 					
 				if((!$isPrivate) || ($userData["priority"] == 3)){

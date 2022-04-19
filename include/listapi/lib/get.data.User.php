@@ -43,7 +43,7 @@ try{
 			header("HTTP/1.1 403 Forbidden"); exit;
 		}
 		
-		$queryUserData .= $whereable;
+		$queryUserData .= " AND ". $whereable;
 		
 		$userData = $db->fetchAssoc($queryUserData,$uid);
 		if(is_string($userData) && (strpos($userData,'error')!== false)){

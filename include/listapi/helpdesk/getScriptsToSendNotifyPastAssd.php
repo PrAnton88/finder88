@@ -102,7 +102,7 @@ try{
 	/* 3. */
 	$display .= 'dataMessage.note = "Оповещение ответственному - о снятии с заявки";';
 	$display .= 'dataMessage.description = "Вы больше НЕ назначемы ответственным на выполнение заявки '.$commonMessage.'";';
-	$queryUserData .= ' u.id='.$nassd;
+	$queryUserData .= ' AND u.id='.$nassd;
 
 	$userData = $db->fetchFirst($queryUserData,$uid);
 	if(is_string($userData) && (strpos($userData,'error')!== false)){
