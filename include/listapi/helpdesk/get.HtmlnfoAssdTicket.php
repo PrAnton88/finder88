@@ -74,7 +74,7 @@ try{
 	$smarty->assign("message",$message);
 	
 	header("HTTP/1.1 200 Ok");
-	return $smarty->display('../default/components/tmp.HtmlnfoAssdTicket.tpl');
+	return $smarty->display('../chunks/components/tmp.HtmlnfoAssdTicket.tpl');
 	
 	
 }catch(ErrorException $ex){

@@ -75,11 +75,11 @@ try{
 		$smarty->assign('nres',$nrequest);
 		$smarty->assign('nassd',$existmess["user_link"]);
 	
-		$display .= $smarty->display('../default/components/tmp.htmlListState-min.tpl');
+		$display .= $smarty->display('../chunks/components/tmp.htmlListState-min.tpl');
 	}else{
 		
 		$smarty->assign("state",$existmess['state']);
-		$display .= $smarty->display('../default/components/tmp.infoState.tpl');
+		$display .= $smarty->display('../chunks/components/tmp.infoState.tpl');
 	}
 	
 	

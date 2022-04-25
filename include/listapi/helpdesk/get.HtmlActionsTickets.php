@@ -88,7 +88,7 @@ try{
 	
 	
 	header("HTTP/1.1 200 Ok");
-	return $smarty->display('../default/components/tmp.htmlActionsTickets-min.tpl');
+	return $smarty->display('../chunks/components/tmp.htmlActionsTickets-min.tpl');
 	
 	
 }catch(ErrorException $ex){

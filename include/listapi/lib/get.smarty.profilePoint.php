@@ -31,7 +31,7 @@ try{
 	$smarty -> assign("adminBroneDevice",checkUserLaws('adminBroneDevice'));
 	
 	
-	return $smarty->display('../default/profilePoint.tpl');
+	return $smarty->display('../chunks/profilePoint.tpl');
 	
 }catch(ErrorException $ex){
 	/*

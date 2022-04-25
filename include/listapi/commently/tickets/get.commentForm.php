@@ -55,7 +55,7 @@ try{
 	$smarty->assign("admin",$admin);
 
 	header("HTTP/1.1 200 Ok");
-	return $smarty->display('../default/commentForm.tpl');
+	return $smarty->display('../chunks/commentForm.tpl');
 	
 	
 }catch(ErrorException $ex){

@@ -85,7 +85,7 @@ try{
 	
 	
 	header("HTTP/1.1 200 Ok");
-	return $smarty->display('../default/components/tmp.row.item.OfRecordTableRequest.tpl');
+	return $smarty->display('../chunks/components/tmp.row.item.OfRecordTableRequest.tpl');
 	
 	
 }catch(ErrorException $ex){
