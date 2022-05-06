@@ -9,6 +9,14 @@ try{
 
 	if($resolution){
 		
+		$nLuminate = false;
+		if(isset($_POST['nLuminate'])){
+			
+			$nLuminate = (int)$_POST['nLuminate'];
+			if($nLuminate == 0){ $nLuminate = false; }
+			
+		}
+		
 		require_once "../config.modx.php";
 		/* get $modx */
 		
@@ -40,6 +48,12 @@ try{
 				// $resultConversation = json_decode($resultConversation,true);
 				
 				
+		/* так как fio записано в таблице conversationcompleted.fio
+			а нужно иногда только fi то возьмём его винзу из getUserData,
+			тем более что к нему все равно обращаемся что бы взять информацию для 
+			вмплывающей подсказки
+		*/
+				
 		try{
 			foreach($resultConversation as &$record){
 				
@@ -57,6 +71,7 @@ try{
 						[int_phone]
 						[ext_phone]
 					*/
+					$record["fi"] = $result["fi"];
 					
 					$record["tooltip"] = $result["dept"].
 					"<br /> Комната: ".$result["nroom"].
@@ -100,10 +115,11 @@ try{
 			
 			
 			
+			$smarty->assign("nLuminate",$nLuminate);
 			$smarty->assign("messages",$resultConversation);
 
 			// print_r($smarty);
-			return $smarty->display('tableBronConversation.tpl');
+			return $smarty->display('tableBroneConversation.tpl');
 		}catch(ErrorException $ex){
 			
 			print "error";
