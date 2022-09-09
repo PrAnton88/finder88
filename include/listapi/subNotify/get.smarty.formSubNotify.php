@@ -37,7 +37,7 @@ try{
 	
 	/* 1. Список всех сотрудников ОТО */
 	
-	$listOtoUsers=$db->fetchAssoc($queryUserData.' AND p.dept = 75 AND r.priority=3',$uid);
+	$listOtoUsers=$db->fetchAssoc($queryUserData.' AND p.dept = 75 AND r.priority=3 ORDER BY u.last_name',$uid);
 	if(is_string($listOtoUsers) && (strpos($listOtoUsers,'error')!== false)){
 		throw new ErrorException('SQL Error');
 	}

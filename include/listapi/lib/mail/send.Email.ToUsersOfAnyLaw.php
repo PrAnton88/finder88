@@ -41,7 +41,7 @@ try{
 
 	/* сначала необходимо выбрать список всех существующих прав */
 	/* и сравнить с переданным $dataRecord['law'] */
-	$query = "SELECT id,nameField,nameLaw,messHelp FROM listlaw WHERE nameField = '".$dataRecord['law']."'";
+	$query = $queryListlaw." WHERE nameField = '".$dataRecord['law']."'";
 	$resplistLaw = $db->fetchFirst($query,$uid);
 	if(is_string($resplistLaw) && (strpos($resplistLaw,'error')!== false)){
 		throw new ErrorException('SQL Error');

@@ -30,6 +30,7 @@ try{
 	}
 	$subject = $dataRecord['subject'];
 	
+	
 	if(!isset($dataRecord['message'])){
 		throw new ErrorException('arg message is not found');
 	}
@@ -37,25 +38,31 @@ try{
 	
 
 	/* $HeadMessage = 'Здравствуйте!<br />Оповещаем вас как ответственного на заявку<br />'; */
-	$HeadMessage = '<span class="normalText">  Здравствуйте!</span><br /><span class="normalText">Оповещаем вас как </span><span class="importantString">ответственного на заявку</span><br />';
+	/*  $HeadMessage = '<span class="italicBoldNote">Ваша заявка принята!</span><br />'; */
 	// $sendmess = "<span class='normalText'>  Здравствуйте, ".$mailt['fio']."!</span><br /><span class='normalText'>".$dtstring['fdatestr']."г. в ".$dtstring['ftimestr']." к заявке №".$mess_id." </span><span class='importantString'>поступил новый комментарий</span><br /><br /><span class='italicBoldNote'>Для просмотра заявки пройдите, пожалуйста, <a href='http://info:86/index.php?id=29&tiket=".$mess_id."'>по этой ссылке</a></span>";
 	
-	
-	
-	$message = $HeadMessage.$message;
+	// $message = $HeadMessage.$message;
 
 	/* нужно выбрать данные пользователя ответственного к заявке */
 	/* в массив $itemMail */
-	$queryTicketsAssd .= $nrequest;
-	$itemMail = $db->fetchFirst($queryTicketsAssd,$uid);
+	$queryApplicantOfTicket .= $nrequest;
+	$itemMail = $db->fetchFirst($queryApplicantOfTicket,$uid);
 	if(is_string($itemMail) && (strpos($itemMail,'error') !== false)){
 		throw new ErrorException('SQL Error');
 	}
+	if(!is_array($itemMail)){
+		throw new ErrorException('data of applicant is invalid (than data is not array)');
+	}
+	
+	if(count($itemMail) == 0){
+		throw new ErrorException('data of applicant is empty (than array is empty)');
+	}
+	
 	$dataListMail[] = $itemMail;
 
 	if(!isset($itemMail['email'])){
-		/* throw new ErrorException('data email of itemMail in not found'); */
-		echo '{"success":1,"description":"data email of itemMail in not found","countMails":"0"}';
+		throw new ErrorException('data email is not found');
+		// echo '{"success":1,"description":"data email of itemMail in not found","countMails":"0"}';
 	}
 	
 	/* if(!sendEmail($itemMail,$subject,$message)){ */
@@ -64,8 +71,8 @@ try{
 	/*3 - оповещени¤ об изменениях к заявке */
 	/* похоже тут либо 3 либо 1 */
 	
-	if(!sendMessage($db,$itemMail,$subject,3 /*$n*/,$message/*,$sendCom=false*/)){
-		throw new ErrorException("Сообщение '$subject' не отправлено");
+	if(!sendMessage($db,$itemMail,$subject,3,$message)){
+		throw new ErrorException("send.Email.ToApplicant: Message '$subject' to Applicant was not sent. see custom/logs/anyEvent.txt");
 	}
 	
 

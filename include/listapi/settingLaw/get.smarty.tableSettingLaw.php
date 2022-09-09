@@ -35,7 +35,7 @@ try{
 	
 	/* 1. Список всех сотрудников ОТО */
 	/* $queryUserData < queryUserData.php < start.php */
-	$listOtoUsers=$db->fetchAssoc($queryUserData.' AND p.dept = 75 AND r.priority=3',$uid);
+	$listOtoUsers=$db->fetchAssoc($queryUserData.' AND p.dept = 75 AND r.priority=3 ORDER BY u.last_name',$uid);
 	if(is_string($listOtoUsers) && (strpos($listOtoUsers,'error')!== false)){
 		throw new ErrorException('SQL Error');
 	}
@@ -55,10 +55,11 @@ try{
 	}
 	
 	$smarty->assign("listOtoUsers",json_encode($listOtoUsers));
+	$smarty->assign("listOtoUsers2",$listOtoUsers);
 	
 	
 	$listLaw = ["l.id as lawid","l.uid"];
-	$query = "SELECT id,nameField,nameLaw,messHelp FROM listlaw ";
+	$query = $queryListlaw;
 	if(!checkUserLaws('adminRoot')){
 		$query .= " WHERE nameField<>'adminRoot'";
 	}
@@ -78,7 +79,7 @@ try{
 	$smarty->assign("resplistLaw",json_encode($resplistLaw));
 	
 	
-	$query = "SELECT $listLaw, u.id, concat_ws(' ', u.last_name, u.first_name, u.patronymic) 'fio', u.post 'prof' FROM law as l LEFT JOIN users as u ON u.role = l.uid";
+	$query = "SELECT $listLaw, u.id as uid, u.role as id, concat_ws(' ', u.last_name, u.first_name, u.patronymic) 'fio', concat_ws(' ', u.last_name, u.first_name ) 'fi', u.post 'prof' FROM law as l LEFT JOIN users as u ON u.role = l.uid ORDER BY u.last_name";
 	$usersLaws = $db->fetchAssoc($query,$uid);
 	if(is_string($usersLaws) && (strpos($usersLaws,'error')!== false)){
 		throw new ErrorException('SQL Error');

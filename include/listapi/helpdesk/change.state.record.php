@@ -61,6 +61,15 @@ try{
 		$assd = (int)$dataRecord['assd'];
 	}
 	
+	if($state == 0){
+		$assd = 'NULL';
+	}
+	
+	if(!$assd){
+		$assd = $user['id'];
+	}
+	
+	
 	$nrequest = false;
 	if(isset($dataRecord['nrequest'])){
 		$nrequest = (int)$dataRecord['nrequest'];

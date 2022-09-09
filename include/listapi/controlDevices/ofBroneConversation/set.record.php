@@ -47,6 +47,18 @@ try{
 
 	
 	
+	/* проверить, вероятно запись с таким же именем уже существует */
+	/* актуально как и для создания записи так и для обновления существующей */
+	$query = "SELECT name FROM conversationdevice WHERE name = '$name'";
+	$res = $db->fetchFirst($query,$uid);
+	if( is_string($res) && (strpos($res,"error") !== false)){
+		throw new ErrorException("SQL Error $res");
+	}
+	if(count($res) > 0){
+		throw new ErrorException("Запись с таким именем уже существует");
+	}
+	
+	
 	
 	if($nRecord === false){
 		/* нов */
@@ -70,6 +82,7 @@ try{
 		if($nRecord <= 0){
 			throw new ErrorException("Нет поля nRecord");
 		}
+		
 		
 		$query = "UPDATE conversationdevice set name='".addslashes($name)."' WHERE id=$nRecord";
 			

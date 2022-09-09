@@ -67,12 +67,12 @@ try{
 	
 	
 	/* есть ли пользователь среди $usersLaws или нет */
-	if(in_array($dataRecord['uid'],$arrUsersUid)){
+	if(in_array($dataRecord['id'],$arrUsersUid)){
 		/* значит пользоаптель уже есть в этой таблице */
 		
 		/* но вдруг новое значение такое же как прежнее */
 		foreach($usersLaws as $item){
-			if($item['uid'] == $dataRecord['uid']){
+			if($item['uid'] == $dataRecord['id']){
 				if($item[$dataRecord['field']] == $dataRecord['val']){
 					throw new ErrorException('Новое значение такое же как прежнее');
 				}
@@ -81,7 +81,7 @@ try{
 		}
 		
 		
-		$checking = $db->update('law', array($dataRecord['field']=>$dataRecord['val']), array(), " uid=".$dataRecord['uid']);
+		$checking = $db->update('law', array($dataRecord['field']=>$dataRecord['val']), array(), " uid=".$dataRecord['id']);
 		
 		if(is_string($checking) && (strpos($checking,'error')!== false)){
 			throw new ErrorException('SQL '.$query.' Error  ');

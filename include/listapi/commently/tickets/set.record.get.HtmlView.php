@@ -1,7 +1,8 @@
 <?php
 
 /* это брат сниппета multiHandComment (133) */
-header('Content-type:text/html');
+// header('Content-type:text/html');
+header('Content-type:text/html; charset=UTF-8');
 
 	$getUserAuthData = true;
 	$sessAccesser = true;
@@ -11,7 +12,6 @@ header('Content-type:text/html');
 	
 try{
 
-	
 	if(!$resolution){
 		header("HTTP/1.1 403 Forbidden"); exit;
 	}
@@ -42,6 +42,17 @@ try{
 		return false;
 	}
 	
+	
+	
+	function getHtmlPreviewComment($message,$prior){
+		
+		if($prior == 1){ $color = '#b38c16'; 
+		}elseif($prior == 2){ $color = '#dc3545'; 
+		}else{ $color = 'gray'; }
+		/* ВЕРСТКУ НЕ ИЗМЕНЯТЬ, а если поменяете то измените и в lib.ToSend.Email.php */
+		
+		return '"\<div style=\"border: 2px solid '.$color.'; width: 120px; display: block; margin:10px 30px; background-color: white; color: '.$color.';\" \>\<text\>'.$message.'\<\/text\>\<\/div\>";';
+	}
 	
 	/* use exam
 	
@@ -147,7 +158,7 @@ try{
 	}
 	
 	if($comment == ''){
-		throw new ErrorException("arg comment is not found!");
+		throw new ErrorException("arg comment is empty!");
 	}
 	
 	
@@ -177,16 +188,18 @@ try{
 	
 	$display = '';
 	
-	if(!$chunk){ 
+	if(!$chunk){
 		throw new ErrorException("chunk commentItem is not found!");
 	}
-			
+	
 	if($nParent == 0){
-		$nParent = ''; 
+		$nParent = '';
 	}
-			
-			
+	
+	
+	
 	// $nRecord, /* номер заявки или номер ресурса */
+	/* к сожалению частично повторяет снипет getCommentItems */
 	
 	$comment = str_replace("\n","<br/>",$comment);
 	
@@ -201,11 +214,25 @@ try{
 		'ncommon' => $nCommon,
 		'type' => 'tickets',
 		'editable' => 1,
-		'repliedly' => 1
+		'repliedly' => 1,
+		'avatar' => $user['avatar']
 	));
 
+	if($nParent && ( ((int) $nParent) != 0)){
+		$display .= '<ol class="children tr">';
+	}
+
+
+
+	$display .= '<li class="comment odd alt thread-even depth-1 tr">';
 	$display .= $ashtml;
-	$display .= '<script>customMess("Комментарий добавлен");';
+	$display .= '</li>';
+	if($nParent && ( ((int) $nParent) != 0)){
+		echo '</ol>';
+	}
+	
+	
+	$display .= '<script>message.print("Комментарий добавлен");';
 	
 	/* и оповещения */
 	
@@ -225,23 +252,52 @@ try{
 	}
 	
 	$display .= '(function(){';
-		$display .= 'let completeSend = function (){ customMess("Сообщение отправлено"); };';
-		$display .= 'let dataMessage = {};';
+		$display .= 'let completeSend = function (mess){ message.print(mess?mess:"Сообщение отправлено"); };';
+		$display .= 'let oSender = oBaseAPI.message.email;';
 		
-		$display .= 'dataMessage.nrequest = '.$nRecord.';';
 		
 		/*  */
-		$title = str_replace('"','\'',$title);
-		$comment = str_replace('"','\'',$comment);
-		/* иначе, на выходе из pho будет нечто вроде "строка сообщения "а тут ковычки"  " -
-		что на клиенте не сможет быть и6нтерпретирвоано с помощью javascript */
+		// $title = str_replace('"','\'',$title);
+		// $comment = str_replace('"','\'',$comment);
 		
-		$display .= 'dataMessage.description = "';
-		if($title != ''){
-			$display .= $title.'<br />';
+		
+		if(($title != '') && ($comment != '')){
+			$title .= '<br />';
 		}
-		$display .= $comment.'";';
-		$display .= 'dataMessage.subject = "new Comment";';
+		
+		$title = str_replace("\\","\\\\",$title);
+		$title = str_replace('"','\"',$title);
+		$commonMessageComment = $user['fio'].':<br />- '.html_entity_decode(htmlspecialchars($title));
+		
+		$comment = str_replace("\\","\\\\",$comment);
+		$comment = str_replace('"','\"',$comment);
+		$commonMessageComment .= html_entity_decode(htmlspecialchars($comment));
+		
+		
+		$header = $message["header"];
+		$header = str_replace("\\","\\\\",$header);
+		$header = str_replace('"','\"',$header);
+	
+		$commonMessageTicket = html_entity_decode(htmlspecialchars('№ '.$message["id"].' \"'.$header.'\"<br />'));
+		
+		
+		
+		
+		$displayHeader = '(function(nrequest){let dataMessage = {};dataMessage.nrequest = nrequest;';
+		$displayHeader .= 'dataMessage.subject = "Новый комментарий";';/* тема письма */
+		// $displayHeader .= 'dataMessage.measure = "Новый комментарий";';/* первая строка в письме - заголовок (тема) */
+		$displayHeader .= 'dataMessage.measure = "'.$dateReg.' добавлен новый комментарий к заявке";';/* первая строка в письме - заголовок (тема) */
+		$displayHeader .= 'dataMessage.description = "'.$commonMessageTicket.'";';
+		
+		
+		
+		$displayFooter = '(dataMessage,function(){ completeSend(note); });})('.$nRecord.');';
+		
+		
+		/* иначе, на выходе из pho будет нечто вроде "строка сообщения "а тут кавычки"  " -
+		что на клиенте не сможет быть интерпретирвоано с помощью javascript */
+		
+		
 		
 		/*
 		$ashtml = (string)$ashtml;
@@ -253,9 +309,7 @@ try{
 		$display .= 'dataMessage.ashtml = "'.$ashtml.'";';
 		*/
 		
-		
-		$display .= 'let oSender = oBaseAPI.message.email;';
-		
+		$passCommentlyAssd = false;
 		if($nParent != ''){
 			/* заявитель и / или инициатор так и так будут оповещены (см ниже) */
 			/* теперь выберем данные о пользователе который сделал родительский комментарий */
@@ -269,9 +323,10 @@ try{
 			}
 			
 			if(
-				($messageParent["user_link"] != $user['uid']) &&
-				($messageParent["user_link"] != $message['applicant']) &&
+				($messageParent["user_link"] != $user['uid']) && /* если вы отвечаете не на свой комментарий */
+				($messageParent["user_link"] != $message['applicant']) && /* если комментарий не комментарий заявителя */
 				( ($message['assd'] == '') || ($messageParent["user_link"] != $message['assd']) )
+				/* если нет ответственного на заявку или ответственный - не автор комментария */
 			){
 				
 				/* необходимо узнать и права того сотрудника */
@@ -283,8 +338,23 @@ try{
 					
 				if((!$isPrivate) || ($userData["priority"] == 3)){
 				
-					$display .= 'dataMessage.note = "Новый комментарий на ваш комментарий";';
-					$display .= 'oSender.sendToAuthorTicketComment(dataMessage,completeSend);';
+					$display .= $displayHeader;
+					/*
+					$display .= 'dataMessage.description = "'.$commonMessageTicket.' На ваш комментарий (некоторый конкретный комментарий),";';
+					*/
+
+					$display .= 'dataMessage.ashtml = '.getHtmlPreviewComment($commonMessageComment,$message['prior']);
+					/* $display .= 'dataMessage.note = "Комментирование вашего комментария";'; */
+					$display .= 'dataMessage.ncomment = '.$nParent.';';
+					
+					/* это может быть как ответственный так и любой другой админ - потенциальный ответственный */
+					$display .= 'let note = "Комментирование комментария";';
+					$display .= 'oSender.sendToAuthorTicketComment'.$displayFooter;
+					
+					/* если этот сотрудник - Ответственный заявки, то $passCommentlyAssd = true */
+					if(($message["assd"] != '') && ($messageParent["user_link"] == $message["assd"])){
+						$passCommentlyAssd = true;
+					}
 					
 				}
 			}
@@ -295,17 +365,24 @@ try{
 			/* оповестим Ответственного - если назначен ответстыенный на заявку */
 			
 			if($message['assd'] != ''){
+				/* если был комментарий комментария Ответственного, то ответственный уже оповещен - выше */
+				/* это нужно узнать */
+				if(!$passCommentlyAssd){
 				
-				$display .= 'dataMessage.note = "Оповещение ответственному";';
-				$display .= 'oSender.sendToAssdTickets';
+					
+					$display .= $displayHeader;
+					/*
+					$display .= 'dataMessage.description = "'.$commonMessageTicket.'";'; */
+					
+					$display .= 'dataMessage.ashtml = '.getHtmlPreviewComment($commonMessageComment,$message['prior']);
+					/* $display .= 'dataMessage.note = "от заявителя заявки";'; */
 				
-			}else{
-				
-				// $display .= 'dataMessage.note = "Оповещение инициатору - Ответственный на вашу заявку ещё не назначен";';
-				$display .= 'dataMessage.note = "Оповещение инициатору. Новый комментарий. ";';
-				$display .= 'oSender.sendToApplicantTickets';
-				
+					$display .= 'let note = "Оповещение ответственному";';
+					$display .= 'oSender.sendToAssdTickets'.$displayFooter;
+					
+				}
 			}
+			
 		}elseif($admin != 0){
 			/* оставил коммент кто то из админов - возможно ответственный, или любой другой */
 			
@@ -318,10 +395,18 @@ try{
 				
 				if(($message['applicantPrior'] == 3) || ((!$isPrivate) && ($message['applicantPrior'] != 3))){
 					/* оповестим заявителя */
-					$display .= 'dataMessage.note = "Оповещение заявителю";';
 					
-					$display .= 'oSender.sendToApplicantTickets';
+					$display .= $displayHeader;
 					
+					/*
+					$display .= 'dataMessage.description = "'.$commonMessageTicket.'";';
+					*/
+					
+					$display .= 'dataMessage.ashtml = '.getHtmlPreviewComment($commonMessageComment,$message['prior']);
+					/* $display .= 'dataMessage.note = "от исполнителя заявки";'; */
+					
+					$display .= 'let note = "Оповещение заявителю";';
+					$display .= 'oSender.sendToApplicantTickets'.$displayFooter;
 					
 				}
 			}else{
@@ -329,20 +414,48 @@ try{
 				/* 1. оповестим ответственного (как минимум ответственный должен быть с правами админа) */
 				/* 2. оповестим заявителя - если коммент не приватен и заявитель не админ или заявитель админ */
 				
-				$display .= 'dataMessage.note = "Оповещение ответственному";';
+				/* 1. оповестим ответственного - только если он есть */
+				if($message['assd'] != ''){
+					
+					$display .= $displayHeader;
+					
+					/*
+					$display .= 'dataMessage.description = "'.$commonMessageTicket.'";';
+					*/
+
+					$display .= 'dataMessage.ashtml = '.getHtmlPreviewComment($commonMessageComment,$message['prior']);
+					/* $display .= 'dataMessage.note = "предположительно помощь/совет";'; */
+					
+					$display .= 'let note = "Оповещение ответственному";';
+					$display .= 'oSender.sendToAssdTickets'.$displayFooter;
+					
+				}
 				
-				/* 1. оповестим ответственного */
-				$display .= 'oSender.sendToAssdTickets(dataMessage,completeSend);';
 				
 				if(($message['applicantPrior'] == 3) || ((!$isPrivate) && ($message['applicantPrior'] != 3))){
 					/* 2. оповестим заявителя */
-					$display .= 'dataMessage.note = "Оповещение заявителю";';
 					
-					$display .= 'oSender.sendToApplicantTickets';
+					$display .= $displayHeader;
+					
+					/*
+					$display .= 'dataMessage.description = "'.$commonMessageTicket.'";';
+					*/
+					
+					$display .= 'dataMessage.ashtml = '.getHtmlPreviewComment($commonMessageComment,$message['prior']);
+					/* $display .= 'dataMessage.note = "предположительно помощь/совет";'; */
+					
+					$display .= 'let note = "Оповещение заявителю";';
+					$display .= 'oSender.sendToApplicantTickets'.$displayFooter;
+					
+					
 				}
+				
+				
+				
+				
 			}
 		}
-		$display .= '(dataMessage,completeSend);';
+		
 	
 	$display .= '})();';
 	$display .= '</script>';

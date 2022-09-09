@@ -29,10 +29,10 @@ try{
 	$message = $dataRecord['message'];
 	
 
-	$HeadMessage = 'Здравствуйте!<br />Оповещаем вас как единственного получателя<br />';
+	/* $HeadMessage = 'Здравствуйте!<br />Оповещаем вас как единственного получателя<br />';
 	$HeadMessage = '<span class="normalText">  Здравствуйте!</span><br /><span class="normalText">Оповещаем вас как </span><span class="importantString" >единственного получателя</span><br />';
 	
-	$message = $HeadMessage.$message;
+	$message = $HeadMessage.$message; */
 
 	if(isset($_POST['dataListMail'])){
 		$dataListMail = html_entity_decode(htmlspecialchars($_POST['dataListMail']));
@@ -52,7 +52,7 @@ try{
 		
 		/* if(!sendEmail($itemMail,$subject,$message)){ */
 		if(!sendMessage($db,$itemMail,$subject,false/*$n*/,$message/*,$sendCom=false*/)){
-			throw new ErrorException("Сообщение '$subject' не отправлено");
+			throw new ErrorException("message '$subject' was not sended");
 		}
 	}
 

@@ -41,9 +41,9 @@ function attemptHtml(&$list){
 	}
 }
 
-$listPos = array("theme","measure","ashtml","description","message","date","time","datetime","applicant","fio","email","note","devices","nrequest","user");
-$listAlias = array("Тема: ","","Представление html","","","На: ","На: ","На: ","Инициатор: ","Инициатор: ","Почта инициатора: ","","Необходимое оборудование: ",
-	"<br /><br />Что бы перейти к заявке пройдите, пожалуйста, по ","Пользователь: "
+$listPos = array("theme","measure","description","message","date","time","datetime","applicant","fio","ashtml","email","note","devices","nrequest","user");
+$listAlias = array("Тема: ","","","","На: ","На: ","На: ","Инициатор: ","Инициатор: ","Представление html","Почта инициатора: ","","Необходимое оборудование: ",
+	"<br />Для просмотра заявки нажмите по ","Пользователь: "
 );
 	
 
@@ -164,12 +164,16 @@ if($resolution){
 					$display .= ' */'; 
 				}
 				
-				$display .= '</span><br />';
+				$display .= '</span>';
+				
+				if(($item["field"] != "nrequest") && ($item["field"] != "email")){
+					$display .= '<br />';
+				}
+				
 			}else{
 				
-				$display .= $item["value"].'<br />';
+				$display .= $item["value"];
 			}
-			
 		}
 	
 		echo $display;

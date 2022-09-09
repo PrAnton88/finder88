@@ -86,16 +86,17 @@ try{
 	
 	
 	$display .= '<script>(function(){';
-	$display .= 'let completeSend = function (){ customMess("Сообщение отправлено"); };';
+	$display .= 'let completeSend = function (){ message.print("Сообщение отправлено"); };';
 	$display .= 'let oSender = oBaseAPI.message.email;';
 	$display .= 'let dataMessage = {};';
 	
 	$display .= 'dataMessage.nrequest = '.$nrequest.';';
-	$display .= 'dataMessage.subject = "ticket state";';
+	/* $display .= 'dataMessage.subject = "ticket state";'; */
+	$display .= 'dataMessage.subject = "Вы освобождены от выполнения заявки ";';
 	
 	
 	$commonMessage = ('<br /> №'.$existmess["id"].' \"'.$existmess["header"].'\"<br />');
-	/* $display .= 'customMess("'.$nassd.' '.$existmess["user_link"].'");'; */
+	/* $display .= 'message.print("'.$nassd.' '.$existmess["user_link"].'");'; */
 	
 
 			

@@ -1,8 +1,8 @@
 <?php
 header('Content-type:text/html');
 
-	$getUserAuthData = true;
-	$sessAccesser = true;
+	$getUserAuthData = false;
+	$sessAccesser = false;
 	
 	$path = '../../';
 	require_once "$path../start.php";
@@ -18,7 +18,10 @@ try{
 	$modx->smarty = $smarty;
 	
 	
-	return $smarty->display('components/FormAnyCalendar.tpl');
+	$display = $smarty->display('components/FormAnyCalendar.tpl');
+	$display .= $smarty->display('components/FormAnyCalendar.preview.new.tpl');
+	
+	return $display;
 	
 }catch(ErrorException $ex){
 	/*

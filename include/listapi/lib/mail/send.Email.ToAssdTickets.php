@@ -37,16 +37,15 @@ try{
 	
 
 	/* $HeadMessage = 'Здравствуйте!<br />Оповещаем вас как ответственного на заявку<br />'; */
-	$HeadMessage = '<span class="normalText">  Здравствуйте!</span><br /><span class="normalText">Оповещаем вас как </span><span class="importantString">ответственного на заявку</span><br />';
+	// $HeadMessage = '<span class="italicBoldNote">  Новая заявка!</span><br />';
 	// $sendmess = "<span class='normalText'>  Здравствуйте, ".$mailt['fio']."!</span><br /><span class='normalText'>".$dtstring['fdatestr']."г. в ".$dtstring['ftimestr']." к заявке №".$mess_id." </span><span class='importantString'>поступил новый комментарий</span><br /><br /><span class='italicBoldNote'>Для просмотра заявки пройдите, пожалуйста, <a href='http://info:86/index.php?id=29&tiket=".$mess_id."'>по этой ссылке</a></span>";
-	
-	
-	
-	$message = $HeadMessage.$message;
+	// $message = $HeadMessage.$message;
 
 	/* нужно выбрать данные пользователя ответственного к заявке */
 	/* в массив $itemMail */
 	$queryTicketsAssd .= $nrequest;
+	
+	
 	$itemMail = $db->fetchFirst($queryTicketsAssd,$uid);
 	if(is_string($itemMail) && (strpos($itemMail,'error') !== false)){
 		throw new ErrorException('SQL Error');
@@ -64,7 +63,7 @@ try{
 	/*3 - оповещени¤ об изменениях к заявке */
 	/* похоже тут либо 3 либо 1 */
 	
-	if(!sendMessage($db,$itemMail,$subject,3 /*$n*/,$message/*,$sendCom=false*/)){
+	if(!sendMessage($db,$itemMail,$subject,3,$message)){
 		throw new ErrorException("Сообщение '$subject' не отправлено");
 	}
 	

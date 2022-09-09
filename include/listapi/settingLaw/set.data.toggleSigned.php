@@ -43,22 +43,22 @@ try{
 	}
 	
 
-	/* id 
-	uid
-	adminConversation] => 0
-    [dispatchConversation] => 0
-    [adminBroneDevice] => 0
-    [dispatchToBroneDevice] => 0
+	/* id - role.id = user.role 
+	   uid - user.id 
+	adminConversation] => 0 
+    [dispatchConversation] => 0 
+    [adminBroneDevice] => 0 
+    [dispatchToBroneDevice] => 0 
     [adminSectionDocs] */
 	
 	
 	/* теперь будет интересовать есть ли пользователь среди $usersLaws или нет */
 	
 	
-	if(in_array($dataRecord['uid'],$arrUsersUid)){
+	if(in_array($dataRecord['id'],$arrUsersUid)){
 		/* значит пользоаптель уже есть в этой таблице */
 		
-		$query = 'DELETE FROM law WHERE uid = '.$dataRecord['uid'];
+		$query = 'DELETE FROM law WHERE uid = '.$dataRecord['id'];
 		$signeding = $db->query($query,$uid);
 		
 		if(is_string($signeding) && (strpos($signeding,'error')!== false)){
@@ -70,7 +70,7 @@ try{
 	}else{
 		
 		/* всё что не относится к полям в listlaw - то нужно убрать из $dataRecord */
-		$listLaw = array('uid'=>$dataRecord['uid'],
+		$listLaw = array('uid'=>$dataRecord['id'],
 			'adminConversation'=>(isset($dataRecord['adminConversation'])?$dataRecord['adminConversation']:0),
 			'dispatchConversation'=>(isset($dataRecord['dispatchConversation'])?$dataRecord['dispatchConversation']:0),
 			'dispatchToBroneDevice'=>(isset($dataRecord['dispatchToBroneDevice'])?$dataRecord['dispatchToBroneDevice']:0),

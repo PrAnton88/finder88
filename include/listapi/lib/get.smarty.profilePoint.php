@@ -29,7 +29,9 @@ try{
     $smarty -> assign("adminSettingLaw",checkUserLaws('adminSettingLaw'));
 	$smarty -> assign("adminConversation",checkUserLaws('adminConversation'));
 	$smarty -> assign("adminBroneDevice",checkUserLaws('adminBroneDevice'));
-	
+	$smarty -> assign("editorNews",checkUserLaws('editorNews'));
+	$smarty -> assign("editorDocsWithoutGOPB",checkUserLaws('editorDocsWithoutGOPB'));
+	$smarty -> assign("editorDocsGOPB",checkUserLaws('editorDocsGOPB'));
 	
 	return $smarty->display('../chunks/profilePoint.tpl');
 	

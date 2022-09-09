@@ -55,10 +55,17 @@ try{
 		*/
 				
 		try{
+			
+			$tmp = null;
 			foreach($resultConversation as &$record){
 				
 				$whereAnd = " u.id=".$record["userId"];
 				$result = getUserData($db,$uid,$whereAnd);
+				
+				
+				$tmp = explode("-", $record['time']);
+				$record['time'] = $tmp[0]." - ".$tmp[1];
+				
 				
 				
 				if((is_string($result)) && (strpos($result,"error") !== false)){

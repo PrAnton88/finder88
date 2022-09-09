@@ -27,7 +27,7 @@ try{
 	$message = $dataRecord['message'];
 	
 	
-	$HeadMessage = '<span class="normalText">  Здравствуйте!</span><br /><span class="normalText">Оповещаем вас как </span><a class="importantString" href="http://info:86/index.php?id=68">подписанного на оповещения</a><span class="normalText"> о новых заявках.</span><br />';
+	$HeadMessage = '<span class="italicBoldNote">Поступила новая заявка</span><br /><span class="italicBoldNote">Оповещаем вас как </span><a class="importantString" href="http://info:86/index.php?id=158">подписанного на оповещения</a><span class="italicBoldNote">.</span><br />';
 	$message = $HeadMessage.$message;
 	
 
@@ -37,13 +37,17 @@ try{
 	if(is_string($listAdminSigned) && (strpos('error',$listAdminSigned) !== false)){
 		throw new ErrorException("SQL Error when selecting emalis admins signed");
 	}
+	
 	$dataListMail = $listAdminSigned;
 	
-	/*
+	
+	
+	// print_r($dataListMail);
+	
 	if(count($dataListMail) == 0){
 		throw new ErrorException('Получатели не определены. count(dataListMail) = 0');
 	}
-	*/
+	
 	foreach($dataListMail as $itemMail){
 		if(!isset($itemMail['email'])){
 			throw new ErrorException('data email of itemMail in not found');
@@ -51,7 +55,7 @@ try{
 		
 		/* if(!sendEmail($itemMail,$subject,$message)){ */
 		if(!sendMessage($db,$itemMail,$subject,2 /*$n*/,$message/*,$sendCom=false*/)){
-			throw new ErrorException("this process send message '$subject' returned false");
+			throw new ErrorException("this process send message '$subject' as failed. see logs/anyEvent.txt");
 		}
 	}
 

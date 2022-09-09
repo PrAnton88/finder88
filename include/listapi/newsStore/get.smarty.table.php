@@ -9,7 +9,7 @@ try{
 	$modx->smarty = $smarty;
 	
 	
-	return $smarty->display('tableNewsStore.tpl');
+	return $smarty->display('tableNewsStore.new.tpl');
 	
 }catch(ErrorException $ex){
 	/*

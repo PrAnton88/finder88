@@ -9,7 +9,7 @@ try{
 	$modx->smarty = $smarty;
 	
 	
-	return $smarty->display('listDateNews.tpl');
+	return $smarty->display('components/listDateNews.tpl');
 	
 }catch(ErrorException $ex){
 	/*

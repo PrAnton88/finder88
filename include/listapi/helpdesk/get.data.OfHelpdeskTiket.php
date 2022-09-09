@@ -10,6 +10,16 @@ header('Content-type:text/html');
 
 try{
 
+	/* useExam
+
+		1. oBaseAPI.helpdesk.getDataTiket(4519,console.log);
+
+		2. oBaseAPI.helpdesk.getDataTiket(nrequest,function(oDataTiket){
+			// oDataTiket have json format
+			
+		});
+	*/
+
 	if(!$resolution){
 		header("HTTP/1.1 403 Forbidden"); exit;
 	}
@@ -29,14 +39,32 @@ try{
 		throw new ErrorException('arg nrequest is empty');
 	}
 	
-	$query = "SELECT * FROM request WHERE hidden<1 AND id = ".$nrequest;
+	/* ранее $query = "SELECT * FROM request WHERE id = ".$nrequest; */
+	require_once $path."lib/query/get.query.ListTickets.php";
 
-	$dataTickets = $db->fetchAssoc($query,$uid);
+
+	$query = getQueryToGetTickets()." WHERE a.id = ".$nrequest;
+	
+	
+
+
+	$dataTickets = $db->fetchFirst($query,$uid);
 	if(is_string($dataTickets) && (strpos($dataTickets,'error')!== false)){
 		throw new ErrorException('SQL Error');
 	}
 	
+	
+	/* $dataTickets['u'] = $user; */
+	
+	/* условие выдачи = пользователь админ, или заявка не удалена и заявка из отдела пользователя */
+	if(!(($user['priority'] == 3) || ( ($dataTickets['hidden'] == 0) && ($dataTickets['ndept'] == $user['otdel']) ))){
+		
+		header("HTTP/1.1 403 Forbidden"); exit;
+	}
+	
 	echo '{"success":1,"data":'.json_encode($dataTickets).'}';
+	
+	
 	
 }catch(ErrorException $ex){
 	echo '{"success":0,"description":"'.exc_handler($ex).'"}';

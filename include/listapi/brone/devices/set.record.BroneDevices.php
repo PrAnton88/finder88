@@ -50,51 +50,57 @@ try{
 	$deviceName = '';
 	$deviceCount = '';
 
+
 	function bulidListDeviceChecked(){
 		// собрать выбранные устройства в строку
 		
 		global $checkedDevicesTypes;
+		$checkedDevicesAllTypes = array();
 		
-		$checkedDevices = array();
-		$listdevice = 'Запрашиваемые устройства: ';
+		$listdevice = '';
+		$currentType = '';
 		
 		foreach($checkedDevicesTypes as $itemType){
-			$listdevice .= '('.$itemType['name'].') ';
+			$currentType = '('.$itemType['name'].') ';
 			
-			$deviceName = '';
-			$deviceCount = 1;
 			// $itemDevices [id,name]
-			
 			$itemDevices = $itemType['checkedDevices'];
+			// $checkedDevicesAllTypes[] = $itemDevices;
 			
-			$deviceName = $itemDevices[0]['name'];
-			$listdevice .= $deviceName.'  -->';
 			
-			$checkedDevices[] = $itemDevices[0];
+			$issetDevice = array();
+			$checkedDevices = array();
 			
-			for($i = 1; $i<count($itemDevices); $i++){
 			
-				if($itemDevices[$i]['name'] != $deviceName){
-					
-					$listdevice .= $deviceCount.' шт; ';
-					$deviceCount = 1;
-					
-					$deviceName = $itemDevices[$i]['name'];
-					
-					$listdevice .= '('.$itemType['name'].') ';
-					$listdevice .= $deviceName.' -->';
-				}else{
-					
-					$deviceCount++;
+			foreach($itemDevices as $device){
+				
+				$checkedDevicesAllTypes[] = $device;
+				foreach($checkedDevices as $item){
+				
+					if($item['name'] == $device['name']){
+						$issetDevice = $item;
+						break;
+					}
+				}
+			
+				
+				if(count($issetDevice) == 0){
+
+					$checkedDevices[] = $device;
 				}
 				
-				$checkedDevices[] = $itemDevices[$i];
+				
+				$issetDevice = array();
 			}
-			$listdevice .= $deviceCount.' шт; ';
 			
+			foreach($checkedDevices as $item){
+				
+				$listdevice .= $currentType;
+				$listdevice .= $item['name'].' -->'.$item['count'].' шт; ';
+			}	
 		}
 		
-		return array('strListdevice'=>$listdevice,'checkedDevices'=>$checkedDevices);
+		return array('strListdevice'=>'Запрашиваемые устройства: '.$listdevice,'checkedDevices'=>$checkedDevicesAllTypes);
 	}
 
 	
@@ -213,7 +219,7 @@ try{
 		/* редактирование  */
 		/* обновление $title и $body */
 		$query = "SELECT * FROM bronedevicecomplete WHERE id=$nRecord";
-		$existRecord = $db->fetchFirst($query);
+		$existRecord = $db->fetchFirst($query,true);
 		if((is_string($existRecord)) && (strpos($existRecord,"error") !== false)){
 			throw new ErrorException("SQL Error. get request data has failed."); exit;
 		}
@@ -271,6 +277,51 @@ try{
 		}
 		
 		
+		if($update){
+			/* в режиме редактирования, часть устройств переданная в массиве может быть уже выдана */
+			/* сначала нужно узнать какие именно устройства уже выданы, 
+			что бы не перезаписать поле bronedevicedate.free = 0 - будто снова только запрошены */
+			
+			
+			$query = "SELECT free FROM bronedevicedate WHERE idtick = $nRecord";
+			$query2 = "";
+			foreach($checkedDevices as &$device){
+				
+				$query2 = $query." AND iddevice = ".$device['id'];
+				
+				$existRecord = $db->fetchFirst($query2,true);
+				if((is_string($existRecord)) && (strpos($existRecord,"error") !== false)){
+					throw new ErrorException("SQL Error. get request data has failed. query = ".$query2); exit;
+				}
+				
+				if(!is_array($existRecord)){
+					throw new ErrorException("data is nit array. query = ".$query2); exit;
+				}
+				
+				if(count($existRecord) > 0 ){
+				
+				
+					if(!isset($existRecord['free'])){
+						throw new ErrorException("data .free is not exist. query = ".$query2); exit;
+					}
+					
+					$device['free'] = $existRecord['free'];
+					
+				}else{
+					/* просто не было ранее забронировано */
+					
+				}
+				
+					
+				// print_r($device);
+				// echo '<br />';
+					
+			}
+		}
+		
+		
+		
+		
 		
 		$query = "DELETE FROM bronedevicedate WHERE idtick=".$nRecord;
 		$result=$db->query($query,$uid);
@@ -281,12 +332,28 @@ try{
 		
 		$description .= '. дата начала '.$datest.', дата окончания '.$dateend;
 		
-		foreach($checkedDevices as $device){
+		
+		// print_r($checkedDevices);
+		
+		
+		foreach($checkedDevices as &$device){
 			
 			// вставляем запись о новом устройстве $device
 			
+			
+			// print_r($device);
+			// echo '<br />';
+			
+			
+			/* ранее возвращенные устройства разрешено бронировать снова */
+			/* тогда признак возврата .free = 1 заменяем на 0 */
+			/* ведь должно юыть можно забронировать то что уже снова в обороте */
+			
+			
 			$insertId = $db->insert("bronedevicedate", 
-				array('iddevice'=>$device['id'],'datest'=>"'$datest'",'dateend'=>"'$dateend'",'idtick'=>$nRecord,'free'=>0), 
+				array('iddevice'=>$device['id'],'datest'=>"'$datest'",'dateend'=>"'$dateend'",'idtick'=>$nRecord,
+				'free'=>( (( isset($device['free']) ) && (((int)($device['free'])) != 0))?( ($device['free'] == 1)?0:$device['free'] ):0 )
+				), 
 				array()
 			);
 			
@@ -305,7 +372,7 @@ try{
 		$dataOutput["update"] = $update;
 	}
 	
-	
+	$dataOutput["listdevice"] = $listdevice;
 	
 	
 	$dataOutput = json_encode($dataOutput);

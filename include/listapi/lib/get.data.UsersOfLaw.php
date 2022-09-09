@@ -30,7 +30,7 @@ try{
 	
 	
 	$listLaw = [];
-	$query = 'SELECT id,nameField,nameLaw,messHelp FROM listlaw';
+	$query = $queryListlaw;
 	$resplistLaw = $db->fetchAssoc($query,$uid);
 	if(is_string($resplistLaw) && (strpos($resplistLaw,'error')!== false)){
 		throw new ErrorException('SQL Error');

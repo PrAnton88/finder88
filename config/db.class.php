@@ -115,8 +115,7 @@ class DB
 		if((is_string($result)) and (strpos($result,"error") !== false)) return $result;
 		if(!$result || mysqli_affected_rows($this->connection)<1) {return array();}
 		
-		$row = mysqli_fetch_assoc($result);
-		return $row;
+		return mysqli_fetch_assoc($result);
 	}
 	
 	function fetchArrayByFieldName($query, $field_name, $ajaxUid=false)

@@ -101,6 +101,8 @@ try{
 		
 		$smarty->assign("stepsTimeBusy",$stepsTimeBusy);
 		
+		/* это только для высоты textarea */
+		$smarty->assign("cDevices",count($listDevices));
 		
 		if($openRecord){
 			
@@ -180,9 +182,12 @@ userId: "108"
 		$smarty->assign("dateApply",$dateApply);
 		
 		
-		return $smarty->display('formBroneConversation.tpl');
+		$display = $smarty->display('BroneConversation.tpl');
+		// $display .= $smarty->display('BroneConversation.form.tpl');
+		$display .= $smarty->display('BroneConversation.form.textWhite.backgroundColorize.tpl');
 		
 		
+		return $display;
 	}else{
 		$description = "";
 		if(!$listDevices){

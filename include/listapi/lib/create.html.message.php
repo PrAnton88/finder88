@@ -43,7 +43,7 @@ function attemptHtml(&$list){
 
 $listPos = array("theme","measure","description","message","date","time","datetime","applicant","fio","email","note","devices","nrequest","user");
 $listAlias = array("Тема: ","","","","На: ","На: ","На: ","Инициатор: ","Инициатор: ","Почта инициатора: ","","Необходимое оборудование: ",
-	"<br /><br />Что бы перейти к заявке пройдите, пожалуйста, по ","Пользователь: "
+	"<br /><br />Для просмотра заявки нажмите по ","Пользователь: "
 );
 	
 

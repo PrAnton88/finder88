@@ -30,23 +30,21 @@ try{
 		$lastDiapazone = $dataRecord['lastDiapazone'];
 	}
 		
-	$db2 = new DB("infokng-copy");
+	include 'config.php';
 	
-	$query = "SELECT  r.id,r.pagetitle as name,r.class_key,r.parent,r.publishedon,r.content,r.introtext FROM modx_site_content as r";
-	
-	
-	
-	$query .= " WHERE parent=6 AND publishedby<>0 AND deleted=0 AND publishedon >= ".$dataRecord['left']." AND publishedon <= ".$dataRecord['right'];
+	$query = "SELECT  r.id,r.pagetitle as name, r.menuindex, r.class_key,r.parent,r.publishedon,r.content,r.introtext FROM modx_site_content as r";
 	
 	
 	
+	$query .= " WHERE parent=$idNews AND publishedby<>0 AND deleted=0 AND publishedon >= ".$dataRecord['left']." AND publishedon <= ".$dataRecord['right'];
 	
-	$result = $db2->fetchAssoc($query,$uid);
+	
+	
+	
+	$result = $db->fetchAssoc($query,$uid);
 	if((is_string($result)) && (strpos($result,"error") !== false)){
 		throw new ErrorException("SQL Error");
 	}
-	
-	
 	
 	$directiontop = false;
 	
@@ -76,12 +74,10 @@ try{
 	}
 	
 	
-	
-	
 	foreach($result as &$item){
 		
 		$query = "SELECT c.value as listtv FROM modx_site_tmplvar_contentvalues as c WHERE c.contentid = ".$item['id'];
-		$resultTmplvars = $db2->fetchAssoc($query,$uid);
+		$resultTmplvars = $db->fetchAssoc($query,$uid);
 		
 		$listtv = array();
 		$itemtv = null;
@@ -141,12 +137,14 @@ try{
 					)
 				);
 				
-				$imageFieldMax = $modx->runSnippet('phpthumbof',
+				/* $imageFieldMax = $modx->runSnippet('phpthumbof',
 					array(
 						'input'=>'/assets/images/'.$item['imageField'],
 						'options'=>'&w=500&h=500&zc=1'
 					)
-				);
+				);*/
+				
+				$imageFieldMax = '/assets/images/'.$item['imageField'];
 				
 				$item['imageField'] = array('min'=>$imageFieldMin,'max'=>$imageFieldMax);
 			}else{
@@ -167,21 +165,36 @@ try{
 			
 			$unixPublishedon = $item['publishedon'];
 			$publishedon = getDateStr($item['publishedon']);
-			$publishedon = $publishedon['fdatestr'].' '.$publishedon['ftimestr'];
+			//$publishedon = $publishedon['fdatestr'].' '.$publishedon['ftimestr'];
+			$publishedon = $publishedon['shortdate'].' '.$publishedon['ftimestr'];
+			
+			/* необходимо переделать в формат 
+				2022-05-18 11:50:00 
+			*/
+			
+			
+			/* вместо substr исплользуйте mb_substr */
+			
+			$htmlForm = $modx->runSnippet('itemNews.call-chank',
+				array(
+					'id'=>$item['id'],
+					'menuindex'=>$item['menuindex'],
+					'title'=>mb_substr(strip_tags($item['name']),0,55,'UTF-8'),
+					'content'=>mb_substr(strip_tags($item['content']),0,205,'UTF-8'),
+					'introtext'=>mb_substr(strip_tags($item['introtext']),0,205,'UTF-8'),
+					'publishedon'=>$publishedon,
+					'imagefield'=>$item['imageField']
+				)
+			);
+			
+			if(!$htmlForm){
+				throw new ErrorException("itemNews.call-chank is not found !!");
+			}
 			
 			$dataOutput[] = array(
 				'id'=>$item['id'],
 				'publishedon'=>$unixPublishedon,
-				'html'=>$modx->runSnippet('itemNews.call-chank',
-					array(
-						'id'=>$item['id'],
-						'title'=>substr($item['name'],0,55),
-						'content'=>substr(strip_tags($item['content']),0,205),
-						'introtext'=>substr(strip_tags($item['introtext']),0,205),
-						'publishedon'=>$publishedon,
-						'imagefield'=>$item['imageField']
-					)
-				)
+				'html'=>$htmlForm
 			);
 			
 			
@@ -189,6 +202,9 @@ try{
 		
 		
 		$dataOutput = array_reverse($dataOutput);
+		
+		// print_r($dataOutput);
+		
 	}
 	
 	/*
@@ -201,10 +217,11 @@ try{
 	
 
 }catch(ErrorException $ex){
+	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
 	
-	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
+	//echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
 }catch(Exception $ex){
-	
-	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
+	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
+	// echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
 }
 ?>

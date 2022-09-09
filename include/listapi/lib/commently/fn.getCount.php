@@ -62,6 +62,31 @@ class oCommentsHand
 		
 		return $countComment;
 	}
+	
+	public function getLastComment($nRecord,$admin){
+		
+		$lastComment = "";
+		
+		$queryComment = "SELECT c.id, c.text, c.user_link, c.hidden, concat_ws(' ', u.last_name, u.first_name) 'fi' FROM comments as c LEFT JOIN users as u ON u.id = c.user_link WHERE (c.parent=0 OR (c.parent IS NULL)) AND c.request = $nRecord ";
+			
+		if($admin){
+			$queryComment .= " AND c.hidden < 2 ";
+		}else{
+			$queryComment .= " AND c.hidden < 1 ";
+		}
+		
+		$comments = $this->db->fetchAssoc($queryComment,true);
+		if( is_string($comments) && (strpos($comments,"error") !== false)){
+			throw new ErrorException("SQL Error");
+		}
+		
+		foreach($comments as $item){
+			
+			$lastComment = $item['fi'].': '.$item['text'];
+		}
+		
+		return $lastComment;
+	}
 
 }
 ?>

@@ -35,7 +35,21 @@ try{
 		//if($admin){
 			
 			/* в $user поместим данные о сотруднике $userv */
-			$user = getUserData($db,$uid,"r.id=$userv");
+			$user = getUserData($db,$uid,"u.id=$userv");
+			
+			if(count($user) == 0){
+				$query = queryDisabledUser;
+				$query .= " AND u.id = $userv";
+				
+				$user = $db->fetchFirst($query,true);
+				
+				if( is_string($user) && (strpos($user,"error") !== false)){
+					throw new ErrorException("SQL error");
+				}
+				
+				
+			}
+			
 			
 		//}
 		/* просматривая чужой профиль не зачем устанавливать настройки */
@@ -48,12 +62,29 @@ try{
 	if(!$userv){
 		// echo 'without userv';
 		
+		$pathAvatar = "/assets/images/avatars/";
+		
+		if($user["avatar"] != ""){
+			$avatar = $pathAvatar.$user["avatar"];
+		}else{
+			$avatar = $pathAvatar."avatar.png";
+			$smarty -> assign("avatarDefault",true);
+		}
+		
+		$smarty -> assign("avatar",$avatar);
+		
 		$mop = $user["mop"];
 		$uop = $user["uop"];
 		$pop = $user["pop"];
-		$updateTechnicalSupport = ($user["updateTechnicalPage"] == 1?"checked":"");
 		
-		$smarty -> assign("updateTechnicalPage",$updateTechnicalSupport);
+		/* $updateTechnicalSupport = ($user["updateTechnicalPage"] == 1?"checked":"");
+		$smarty -> assign("updateTechnicalPage",$updateTechnicalSupport); */
+		
+		
+		$smarty -> assign("updateTechnicalPage",$user["updateTechnicalPage"]);
+		
+		
+		
 		$smarty -> assign("uop",$uop);
 		$smarty -> assign("mop",$mop);
 		$smarty -> assign("pop",$pop);
@@ -67,6 +98,20 @@ try{
 	
 	$smarty -> assign("admin",$admin);
     $smarty -> assign("user",$user);
+	
+	
+	if(isset($_COOKIE['dbtype'])){
+		if($_COOKIE['dbtype'] == "prod"){
+			$dbtype = "prod";
+		}else{
+			$dbtype = "develop";
+		}
+	}else{
+		$dbtype = "develop";
+	}
+	$smarty -> assign("dbtype",$dbtype);
+	
+	
 	
 	return $smarty->display('table.userprofile.tpl');
 	

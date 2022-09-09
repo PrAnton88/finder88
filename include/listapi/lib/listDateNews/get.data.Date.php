@@ -12,19 +12,19 @@ try{
 		exit;
 	}
 	
-	$db2 = new DB("infokng-copy");
+	include 'config.php';
 	
 	
 	
 	$query = "SELECT publishedon as id,pagetitle as name,class_key,parent FROM modx_site_content ";
-	$query .= " WHERE parent=6 AND publishedby<>0 AND deleted=0 ORDER BY publishedon DESC";
+	$query .= " WHERE parent=$idNews AND publishedby<>0 AND deleted=0 ORDER BY publishedon DESC";
 	
 	/*
 	$query = "SELECT id,pagetitle as name,class_key,parent,publishedon,publishedby,deleted FROM modx_site_content ";
 	$query .= " WHERE parent=6";
 	*/
 	
-	$result = $db2->fetchAssoc($query,$uid);
+	$result = $db->fetchAssoc($query,$uid);
 	if((is_string($result)) && (strpos($result,"error") !== false)){
 		throw new ErrorException("SQL Error");
 	}

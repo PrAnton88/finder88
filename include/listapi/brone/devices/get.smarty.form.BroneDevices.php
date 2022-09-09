@@ -14,6 +14,17 @@ try{
 	$modx->smarty = $smarty;
 		
 		
+	$htmlform = 'htmlformBroneDevices';
+		
+	if(isset($_POST['dataConfig'])){
+		$dataConfig = html_entity_decode(htmlspecialchars($_POST['dataConfig']));
+		$dataConfig = json_decode($dataConfig,true);
+		
+		if(isset($dataConfig['htmlform']) && ($dataConfig['htmlform'] != '')){
+			$htmlform = $dataConfig['htmlform'];
+		}
+	}
+		
 	/* типы устройств, в которых есть хотя бы одно устройство этого типа */
 	$query = 'SELECT id,type as name FROM bronedevicetype 
 	WHERE hidden=0 AND display=1 AND (id IN (SELECT e.type as id FROM bronedevicename as e WHERE e.hidden=0	))
@@ -33,7 +44,11 @@ try{
 	// $smarty->assign("messages",$resultTimeBusy);
 
 	// print_r($smarty);
-	return $smarty->display('formBroneDevices.tpl');
+	
+	$display = $smarty->display('oFormtoBroneDevices.tpl');
+	$display .= $smarty->display($htmlform.'.tpl');
+	
+	return $display;
 	
 	
 

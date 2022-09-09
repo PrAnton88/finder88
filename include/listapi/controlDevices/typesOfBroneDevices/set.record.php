@@ -55,6 +55,26 @@ try{
 		$hidden = (int)$dataRecord['hidden'];
 	}
 	
+	
+	
+	/* проверить, вероятно запись с таким же именем уже существует */
+	/* актуально как и для создания записи так и для обновления существующей */
+	$query = "SELECT * FROM bronedevicetype WHERE type = '$type' AND hidden = 0";
+	$res = $db->fetchFirst($query,$uid);
+	if( is_string($res) && (strpos($res,"error") !== false)){
+		throw new ErrorException("SQL Error $res");
+	}
+	if(count($res) > 0){
+		
+		if( ((int) $res['display']) == $display){
+			throw new ErrorException("Запись с таким именем уже существует");
+		}
+	}
+	
+	
+	
+	
+	
 	if($nRecord === false){
 		/* нов */
 		

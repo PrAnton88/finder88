@@ -1,8 +1,8 @@
 <?php
 header('Content-type:text/html');
 
-	$getUserAuthData = true;
-	$sessAccesser = true;
+	$getUserAuthData = false;
+	$sessAccesser = false;
 	
 	$path = '../../';
 	require_once "$path../start.php";

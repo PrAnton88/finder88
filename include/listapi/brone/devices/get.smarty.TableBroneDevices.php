@@ -72,10 +72,10 @@ try{
 	foreach($listRecordsBusy as &$record){
 		
 		$arrDate = explode("-", $record['datest']);
-		$record['datest'] = $arrDate[2]."-".$arrDate[1]."-".$arrDate[0];
+		$record['datest'] = $arrDate[2].".".$arrDate[1].".".$arrDate[0];
 		
 		$arrDate = explode("-", $record['dateend']);
-		$record['dateend'] = $arrDate[2]."-".$arrDate[1]."-".$arrDate[0];
+		$record['dateend'] = $arrDate[2].".".$arrDate[1].".".$arrDate[0];
 		
 		
 		$result = $db->fetchAssoc(($queryGetType." ".$record['id']." GROUP BY id"),true);
@@ -94,7 +94,7 @@ try{
 				throw new ErrorException("Данные о checkedDevices не найдены ");
 				exit;
 			}
-			
+			/* до этих пор всё впорядке (всвязи с багом о постучной выдаче товара) */
 			
 			$otherDevice = $checkedDevices[0]['name'];
 			
@@ -103,7 +103,21 @@ try{
 			
 			$arrayGroupName[] = $checkedDevices[0];
 			
+			
+			$issetDevice = false;
+			
 			foreach($checkedDevices as &$itemDevice){
+				
+				
+				foreach($arrayGroupName as $item){
+				
+					if($item['name'] == $itemDevice['name']){
+						$issetDevice = true;
+						break;
+					}
+				}
+				
+				if($issetDevice){ $issetDevice = false; continue; }
 				
 				if($otherDevice != $itemDevice['name']){
 					
@@ -112,6 +126,8 @@ try{
 					
 					$itemDevice['count'] = getCount($checkedDevices,'name',$otherDevice);
 					
+					
+					/* только если в  */
 					$arrayGroupName[] = $itemDevice;
 				}
 				
@@ -137,6 +153,8 @@ try{
 				[ext_phone]
 			*/
 			
+			$record["fi"] = $result["fi"];
+			
 			$record["tooltip"] = $result["dept"].
 			"<br /> Комната: ".$result["nroom"].
 			"<br /> внутренний телефон ".
@@ -158,7 +176,6 @@ try{
 	$smarty->assign("listJsonRecordsBusy",json_encode($listRecordsBusy));
 
 
-	// print_r($smarty);
 	return $smarty->display('tableBroneDevices.tpl');
 		
 	

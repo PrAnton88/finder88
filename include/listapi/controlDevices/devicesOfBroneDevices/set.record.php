@@ -58,6 +58,39 @@ try{
 	if($nRecord === false){
 		// нов
 		
+		
+		/* мы должны проверить нет ли в этом типе записи с таким же именем */
+		$query = "SELECT type,name FROM bronedevicename WHERE hidden = 0 AND type = $type AND name = '".$dataRecord['name']."'";
+		$res = $db->fetchFirst($query,$uid);
+		if( is_string($res) && (strpos($res,"error") !== false)){
+			throw new ErrorException("SQL Error $res");
+		}
+		if(count($res) > 0){
+			throw new ErrorException("Запись с таким именем уже существует");
+		}
+		
+		
+		
+		
+		$firstInsert = null;
+		
+		for($i = 0; $i < $dataRecord['count']; $i++){
+			/* количество увеличилось */
+			$insertId = $db->insert("bronedevicename", 
+				array(), 
+				$dataRecord
+			);
+				
+			
+			if(!$insertId){
+				throw new ErrorException("запись не создана");
+			}
+			
+			if(!$firstInsert){ $firstInsert = $insertId; }
+		}
+		
+		
+		/*
 		$insertId = $db->insert("bronedevicename", 
 			array(),
 			$dataRecord
@@ -67,9 +100,9 @@ try{
 			throw new ErrorException("запись не создана");
 			exit;
 		}
+		*/
 		
-		
-		$dataOutput["id"] = $insertId;
+		$dataOutput["id"] = $firstInsert;
 		$dataOutput["new"] = true;
 		
 		
@@ -78,6 +111,7 @@ try{
 		if($nRecord <= 0){
 			throw new ErrorException("Нет поля nRecord");
 		}
+		
 		
 		$editRecord = $db->fetchFirst("SELECT * FROM bronedevicename WHERE id = $nRecord",$uid);
 		if(is_string($editRecord) && (strpos($editRecord,'error') !== false)){
@@ -92,6 +126,32 @@ try{
 		if(count($editRecord) == 0){
 			throw new ErrorException('Редактируемый элемент не найден');
 		}
+		
+		
+		
+		/* проверки */
+		/* 1. в этом типе есть ли устройства с таким же именем ? */
+		if(trim($dataRecord['name']) != trim($editRecord['name'])){
+		
+			$query = "SELECT type,name FROM bronedevicename WHERE hidden = 0 AND type = $type AND name = '".trim($dataRecord['name'])."'";
+			$res = $db->fetchFirst($query,$uid);
+			if( is_string($res) && (strpos($res,"error") !== false)){
+				throw new ErrorException("SQL Error $res");
+			}
+			if(count($res) > 0){
+				/* а что если мы просто изменяли количество этого утсройства в этом типе */
+				if(($newType === false) || ($editRecord['count'] == $dataRecord['count'])){
+					
+					throw new ErrorException("Запись с таким именем уже существует");
+				}else{
+					/* вариант умысла - изменили и название на название существующего устройства ещё и количество */
+					/* так как обновление, в этом случае просто обновится запись устройства - теперь будет в нужном количестве */
+					
+				}
+			}
+		}
+		
+		
 		
 		// print_r($editRecord);
 		
@@ -266,10 +326,7 @@ try{
 	}
 	
 	
-	
-	
 	$dataOutput = json_encode($dataOutput);
-	
 	echo '{"success":1,"data":'.$dataOutput.'}';
 	
 

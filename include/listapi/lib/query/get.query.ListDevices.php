@@ -31,13 +31,13 @@ LEFT JOIN users as u ON u.id=c.userid
 
 	function getQueryToGetDevicesOfConversation(){
 		/* устройства для бронирования переговорной */
-		return "SELECT * FROM conversationdevice";
+		return "SELECT * FROM conversationdevice ORDER BY name";
 		
 	}
 
 	function getQueryToGetDevicesTypesOfBroneDevices(){
 		/* типы устройств для бронирования командировочных */
-		return "SELECT * FROM bronedevicetype WHERE hidden<>1";
+		return "SELECT * FROM bronedevicetype WHERE hidden<>1 ORDER BY type";
 		
 	}
 	
@@ -47,7 +47,7 @@ LEFT JOIN users as u ON u.id=c.userid
 		return "SELECT n.id,t.type,n.name,t.id as ntype,n.count,n.description FROM bronedevicename as n 
 LEFT JOIN bronedevicetype as t ON t.id=n.type
 		WHERE n.hidden<>1 
-		GROUP BY n.name ORDER BY n.name 
+		GROUP BY n.name,n.type ORDER BY t.type, n.name 
 		";
 		
 	}

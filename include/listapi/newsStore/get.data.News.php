@@ -25,18 +25,18 @@ try{
 	}
 		
 		
-	$db2 = new DB("infokng-copy");
+	include 'config.php';
 	
 	$query = "SELECT  r.id,r.pagetitle as name,r.class_key,r.parent,r.publishedon,r.content FROM modx_site_content as r";
 	
 	
 	
-	$query .= " WHERE parent=6 AND publishedby<>0 AND deleted=0 AND publishedon > ".$dataRecord['left']." AND publishedon < ".$dataRecord['right'];
+	$query .= " WHERE parent=$idNews AND publishedby<>0 AND deleted=0 AND publishedon > ".$dataRecord['left']." AND publishedon < ".$dataRecord['right'];
 	
 	$query .= " ORDER BY publishedon DESC";
 	
 	
-	$result = $db2->fetchAssoc($query,$uid);
+	$result = $db->fetchAssoc($query,$uid);
 	if((is_string($result)) && (strpos($result,"error") !== false)){
 		throw new ErrorException("SQL Error");
 	}
@@ -44,7 +44,7 @@ try{
 	foreach($result as &$item){
 		
 		$query = "SELECT c.value as listtv FROM modx_site_tmplvar_contentvalues as c WHERE c.contentid = ".$item['id'];
-		$resultTmplvars = $db2->fetchAssoc($query,$uid);
+		$resultTmplvars = $db->fetchAssoc($query,$uid);
 		
 		$listtv = array();
 		$itemtv = null;

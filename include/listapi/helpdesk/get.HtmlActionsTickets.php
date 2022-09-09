@@ -66,20 +66,43 @@ try{
 	$smarty->assign("states",$states);
 	
 	
-	$admins = $db->fetchAssoc($adminsQuery,true);
-	if((is_string($admins)) && (strpos($admins,"error") !== false)){
+	$adminsCurrent = $db->fetchAssoc($queryNowAdmins,true);
+	if((is_string($adminsCurrent)) && (strpos($adminsCurrent,"error") !== false)){
 		throw new ErrorException("SQL Error");
 	}
 	
-	$smarty->assign("admins",$admins);
+	$smarty->assign("admins",$adminsCurrent);
 	
-	
+	/*
+	if($message['assd'] != ''){
+		$adminsPass = $db->fetchFirst($adminsPassQuery." AND a.id =".$message['assd'],true);
+		if((is_string($adminsPass)) && (strpos($adminsPass,"error") !== false)){
+			throw new ErrorException("SQL Error");
+		}
+		
+		$smarty->assign("adminsPass",$adminsPass);
+	}else{
+		$smarty->assign("adminsPass",false);
+	}
+	*/
 	// echo 'assd = '.$message['assd'];
 	// print_r($admins);
 	// echo $query;
 	
 	// print_r($message);
 	
+	/* check dispatchRequest */
+	$query = $queryCheckDispatchRequest." AND id = ".$user['id'];
+	$dispatchRequest = $db->fetchFirst($query,true);
+	if((is_string($dispatchRequest)) && (strpos($dispatchRequest,"error") !== false)){
+		throw new ErrorException("SQL Error when checking dispatchRequest.");
+	}
+	if(is_array($dispatchRequest) && (count($dispatchRequest)>0)){
+		$smarty->assign("dispatchRequest",true);
+	}else{
+		$smarty->assign("dispatchRequest",false);
+	}
+	/* complete check dispatchRequest */
 	
 	$smarty->assign("uid",$user['id']);
 	$smarty->assign("admin",($user['priority'] == 3));

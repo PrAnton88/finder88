@@ -16,7 +16,7 @@ header("Expires: Thu, 28 Nov 2021 18:00:00 GMT");/* не должен ли он 
 		
 		/* get conversationDevice */
 		
-		$listDevicesConversation=$db->fetchAssoc("Select * From `conversationdevice`",$uid);
+		$listDevicesConversation=$db->fetchAssoc("Select * From `conversationdevice` ORDER BY name",$uid);
 		
 		if((is_string($listDevicesConversation)) && (strpos($listDevicesConversation,"error") !== false)){
 			header("HTTP/1.1 500 SQL Error: $listDevicesConversation"); exit;
