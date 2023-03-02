@@ -76,7 +76,7 @@ try{
 	}
 
 	
-	$comment = $db->fetchFirst("SELECT id, user_link FROM comments WHERE hidden<2 AND id=".$id,true);
+	$comment = $db->fetchFirst("SELECT id, user_link, request as nrequest FROM comments WHERE hidden<2 AND id=".$id,true);
 	if( is_string($comment) && (strpos($comment,"error") !== false)){
 		throw new ErrorException("SQL for get record comment has failed");
 	}
@@ -88,6 +88,19 @@ try{
 	/* удалять может если пользователь автор ИЛИ если комментарий от гостя И пользователь Админ */
 	if(($comment['user_link'] != $user["role"]) && (!(($comment["user_link"] == 0) && ($user['priority'] == 3))) ){
 		header("HTTP/1.1 403 Forbidden"); exit;
+	}
+	
+	/* если заявка удалена - то удаление комментария не возможно */
+	/* выбираем информацию о заявке по номеру комментария */
+	require_once $path."lib/query/get.query.ListTickets.php";
+	$query = getQueryToGetTickets()." WHERE a.id=".$comment['nrequest'];
+	$request = $db->fetchFirst($query,true);
+	if( is_string($request) && (strpos($request,"error") !== false)){
+		throw new ErrorException("SQL for get request info");
+	}
+	
+	if($request['hidden'] == 1){
+		header("HTTP/1.1 403 Forbidden. This request has been deleted before"); exit;
 	}
 	
 	
