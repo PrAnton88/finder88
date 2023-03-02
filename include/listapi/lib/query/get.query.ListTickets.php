@@ -19,7 +19,7 @@
     	LEFT JOIN dept as dpt ON dpt.id=e.dept 
     	LEFT JOIN dept as deptAssd ON deptAssd.id=a.deciv_dept
     	LEFT JOIN role as r ON r.id=a.user_link 
-		LEFT JOIN role as ra ON ra.id=a.applicant ";
+		LEFT JOIN role as ra ON ra.id=c.role ";
 	}
 	
 	/* request.user_link = user.id ответственного */
