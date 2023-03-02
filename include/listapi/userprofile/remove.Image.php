@@ -11,7 +11,7 @@ try{
 	
 	/* useExam
 	
-		dataReqNext({file:'listapi/userprofile/clearAvatar.php',type:'json'},
+		dataReqNext({file:'listapi/userprofile/remove.Image.php',type:'json'},
 			function(responseJson){
 				console.log(responseJson);
 				
@@ -33,25 +33,25 @@ try{
 	$query = "SELECT i.image,i.path FROM images as i LEFT JOIN images_context as ic ON ic.nimage = i.id WHERE type=2 AND ic.ncontext=".$user['uid'];
 	$result = $db->fetchFirst($query, $uid);
 	if( is_string($result) && (strpos($result,"error") !== false)){
-		throw new Exception("SQL Error in clearAvatar.php");
+		throw new Exception("SQL Error in remove.Image.php");
 	}
 	
 	$avatar = $result['image'];
 	/* avatar - имя файла который нужно удалить */
 	if(!unlink($_SERVER['DOCUMENT_ROOT'].$result['path'].$avatar)){
-		throw new Exception("RemoveFile Error in clearAvatar.php");
+		throw new Exception("RemoveFile Error in remove.Image.php");
 	}
 	
 	
 	$query = "DELETE FROM images_context WHERE type=2 AND ncontext=".$user['uid'];
 	$result = $db->query($query, true, true);
 	if( is_string($result) && (strpos($result,"error") !== false)){
-		throw new Exception("SQL Error in clearAvatar.php");
+		throw new Exception("SQL Error in remove.Image.php");
 	}
 	
 	
 	
-	echo '{"success":1,"description":"аватар очищен","data":"avatar.png"}';
+	echo '{"success":1,"description":"аватар очищен","data":"/assets/uploads/avatars/avatar.png"}';
 	
 	
 }catch(ErrorException $ex){
