@@ -1,7 +1,7 @@
 <?php
 
 /* это брат сниппета multiHandComment (133) */
-header('Content-type:text/html');
+header('Content-type:application/json');
 
 	$getUserAuthData = true;
 	$sessAccesser = true;
@@ -10,12 +10,15 @@ header('Content-type:text/html');
 	require_once "$path../start.php";
 	
 try{
-
 	
 	if(!$resolution){
-		header("HTTP/1.1 403 Forbidden"); exit;
+		if(count($user) == 0){
+			throw new ErrorException('401 Unauthorized');
+		}
+		
+		// header("HTTP/1.1 403 Forbidden"); exit;
+		throw new ErrorException("HTTP/1.1 403 Forbidden");
 	}
-	
 	
 	/* use exam
 	
@@ -27,17 +30,20 @@ try{
             	        nparent: 0})},console.log);
 	*/
 	
-	if(!isset($_POST['dataRecord'])){
-		throw new ErrorException("Нет данных для записи"); exit;
-	}
-	
 	$dataOutput = array();
 	// $id = $user["uid"];
-	
 	$description = 'Получено сообщение. ';
 	
-	$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
-	$dataRecord = json_decode($dataRecord,true);
+
+	include "$path../headerBase.php";
+	/* availabla for use $dataRecord */
+	
+	
+	//echo is_string($dataRecord);
+	
+	// print_r(json_decode(addslashes($str)));
+	//echo $str;
+	//throw new ErrorException('test Error');
 	
 	/*
 	title: 
@@ -49,15 +55,13 @@ try{
 	
 	$title = '';
 	if(isset($dataRecord['title'])){
-		$title = str_replace('\'','"',$dataRecord['title']);
-		$title = str_replace("\\","/",$title);
+		$title = $dataRecord['title'];
 	}
 	
 	if(!isset($dataRecord['comment'])){
 		throw new ErrorException("недостатчно данных для записи"); exit;
 	}
-	$comment = str_replace('\'','"',$dataRecord['comment']);
-	$comment = str_replace("\\","/",$comment);
+	$comment = $dataRecord['comment'];
 	
 	
 	
@@ -104,12 +108,16 @@ try{
 		throw new ErrorException("SQL for get record ticket has failed");
 	}
 	
-	if(is_array($message) && (count($message)==0)){
+	if(count($message)==0){
 		throw new ErrorException("ticket for create record comment is not found");
 	}
 	
 	if($message['hidden'] == 1){
 		throw new ErrorException("Нельзя комментировать удаленную заявку");
+	}
+	
+	if($message['state'] == 2){
+		throw new ErrorException("Нельзя комментировать выполненную заявку");
 	}
 	
 	$admin = ($user['priority'] == 3);
@@ -132,20 +140,18 @@ try{
 		throw new ErrorException("SQL Error. comments push has failed.");
 	}
 
-	echo '{"success":1}';
+	echo '{"success":1,"description":"комментарий вставлен","data":{"ncomment":"'.$nCommon.'"}}';
 
 	header("HTTP/1.1 200 Ok");
 	exit;
 
 }catch(ErrorException $ex){
-	/* если application/json 
-	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
+	/* если text/html
+	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
 	*/
-	 
-	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
 	
+	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
 }catch(Exception $ex){
-	
-	echo '<script>new UserException("'.exc_handler($ex).'").log();</script>';
+	echo '{"success":0,"description":"'.exc_handler($ex).'"}';
 }
 ?>
