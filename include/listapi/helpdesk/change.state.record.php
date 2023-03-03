@@ -121,11 +121,13 @@ try{
 	
 	$query = "UPDATE request set ";
 	
-	if($assd == 0){ 
+	if($assd == 0){
 		$query .= "user_link=NULL,";
 	}else{
 		$query .= "user_link='".$existmess["user_link"]."',";
 	}
+	
+	$query .="user_apdate=$id,";
 	$query .= " priority='".$existmess["priority"]."', state='".$existmess["state"]."' WHERE id=$nrequest";
 	
 	
