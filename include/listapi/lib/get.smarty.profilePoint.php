@@ -32,6 +32,7 @@ try{
 	$smarty -> assign("editorNews",checkUserLaws('editorNews'));
 	$smarty -> assign("editorDocsWithoutGOPB",checkUserLaws('editorDocsWithoutGOPB'));
 	$smarty -> assign("editorDocsGOPB",checkUserLaws('editorDocsGOPB'));
+	$smarty -> assign("editorCategories",checkUserLaws('editorCategories'));
 	
 	return $smarty->display('../chunks/profilePoint.tpl');
 	
