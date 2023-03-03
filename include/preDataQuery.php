@@ -1,8 +1,12 @@
 <?php
 	
-	$deptsQuery = "SELECT DISTINCT d.id, d.name as deptname FROM dept as d LEFT JOIN place1 as p ON p.dept = d.id WHERE d.hidden=0 AND p.hidden=0 ORDER By d.name";
+	$deptsPreQuery = "SELECT DISTINCT d.id, d.name as deptname, p.comp FROM dept as d LEFT JOIN place1 as p ON p.dept = d.id ";
 	
-	$companiseQuery = "SELECT * FROM companies WHERE hidden=0 AND name NOT LIKE '%Все организации%' ORDER By name";
+	$deptsQuery = $deptsPreQuery." WHERE d.hidden=0 AND p.hidden=0 GROUP BY d.name ORDER BY d.name ASC";
+	
+	$companisePreQuery = "SELECT * FROM companies WHERE hidden=0 AND name NOT LIKE '%Все организации%' ";
+	
+	$companiseQuery = $companisePreQuery." ORDER By name";
 	
 	$adminsQuery = "SELECT a.id, a.post as prof, a.last_name, a.first_name, a.patronymic, concat_ws(' ',a.last_name, a.first_name, a.patronymic) as fio, a.role as ws_link, a.date_role, a.place, a.int_phone, a.ext_phone, a.date_reg FROM users as a LEFT JOIN place1 as b ON a.place = b.id WHERE b.group1 = 36 AND a.id<>0 ";
 	

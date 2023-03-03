@@ -32,11 +32,11 @@ try{
 		
 	include 'config.php';
 	
-	$query = "SELECT  r.id,r.pagetitle as name, r.menuindex, r.class_key,r.parent,r.publishedon,r.content,r.introtext FROM modx_site_content as r";
+	$query = "SELECT  r.id,r.pagetitle as name, r.menuindex, r.class_key,r.parent,r.createdon,r.content,r.introtext FROM modx_site_content as r";
 	
 	
 	
-	$query .= " WHERE parent=$idNews AND publishedby<>0 AND deleted=0 AND publishedon >= ".$dataRecord['left']." AND publishedon <= ".$dataRecord['right'];
+	$query .= " WHERE parent=$idNews AND publishedby<>0 AND deleted=0 AND createdon >= ".$dataRecord['left']." AND createdon <= ".$dataRecord['right'];
 	
 	
 	
@@ -64,7 +64,7 @@ try{
 			$k = 0;
 			foreach($result as &$item){
 				
-				if(($item['publishedon'] >= $lastDiapazone['left']) && ($item['publishedon'] < $lastDiapazone['right'])){
+				if(($item['createdon'] >= $lastDiapazone['left']) && ($item['createdon'] < $lastDiapazone['right'])){
 					unset($result[$k]);
 				}
 				
@@ -126,7 +126,7 @@ try{
 		$modx->runSnippet('func');
 		
 		
-		$publishedon = null;
+		$createdon = null;
 		foreach($result as &$item){
 			if($item['imageField'] != ''){
 				
@@ -160,13 +160,13 @@ try{
 				.imageField: {min: "/assets/components/phpthumbof/cache/card_ru.f7014cca2df93d1aea5aef314643afce45.png", max: "/assets/components/phpthumbof/cache/card_ru.2026beeae7eb1b94ca760586acfc725845.png"}
 				.name: "Новость от менеджера"
 				.parent: "6"
-				.publishedon: "14 апреля 2021 10:21:00"
+				.createdon: "14 апреля 2021 10:21:00"
 			} */
 			
-			$unixPublishedon = $item['publishedon'];
-			$publishedon = getDateStr($item['publishedon']);
-			//$publishedon = $publishedon['fdatestr'].' '.$publishedon['ftimestr'];
-			$publishedon = $publishedon['shortdate'].' '.$publishedon['ftimestr'];
+			$unixcreatedon = $item['createdon'];
+			$createdon = getDateStr($item['createdon']);
+			//$createdon = $createdon['fdatestr'].' '.$createdon['ftimestr'];
+			$createdon = $createdon['shortdate'].' '.$createdon['ftimestr'];
 			
 			/* необходимо переделать в формат 
 				2022-05-18 11:50:00 
@@ -182,7 +182,7 @@ try{
 					'title'=>mb_substr(strip_tags($item['name']),0,55,'UTF-8'),
 					'content'=>mb_substr(strip_tags($item['content']),0,205,'UTF-8'),
 					'introtext'=>mb_substr(strip_tags($item['introtext']),0,205,'UTF-8'),
-					'publishedon'=>$publishedon,
+					'createdon'=>$createdon,
 					'imagefield'=>$item['imageField']
 				)
 			);
@@ -193,7 +193,7 @@ try{
 			
 			$dataOutput[] = array(
 				'id'=>$item['id'],
-				'publishedon'=>$unixPublishedon,
+				'createdon'=>$unixcreatedon,
 				'html'=>$htmlForm
 			);
 			

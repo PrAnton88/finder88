@@ -43,17 +43,18 @@ try{
 	}
 	
 	/* 2. Список тех, кто подписан на оповещения (сотрудников из frontend) */
-	$query = 'SELECT id FROM frontend';
+	// $query = 'SELECT id FROM frontend';
+	$query = $SechenuchQueryCheckedsON;
 	$frontend = $db->fetchAssoc($query,$uid);
 	
 	$idsfrontend = [];
 	foreach($frontend as $item){
 		
-		$idsfrontend[] = $item['id'];
+		$idsfrontend[] = $item['uid'];
 	}
 
 	foreach($listOtoUsers as &$item){
-		$item['signed'] = in_array($item['id'],$idsfrontend);
+		$item['signed'] = in_array($item['uid'],$idsfrontend);
 	}
 	
 	$smarty->assign("listOtoUsers",json_encode($listOtoUsers));

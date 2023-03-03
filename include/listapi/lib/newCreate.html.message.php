@@ -26,6 +26,7 @@ function attemptHtml(&$list){
 			}elseif($key == "nrequest"){
 				/* символ & заменять на %26 */
 				$value = "<a href='http://".$_SERVER['HTTP_HOST']."/index.php?id=29%26tiket=".$value."'>этой ссылке</a>";
+				// $value = "<a href='http://".$_SERVER['HTTP_HOST']."/index.php?id=29&tiket=".$value."'>этой ссылке</a>";
 				
 			}elseif($key == "email"){
 				/* символ & заменять на %26 */
@@ -41,9 +42,11 @@ function attemptHtml(&$list){
 	}
 }
 
-$listPos = array("theme","measure","description","message","date","time","datetime","applicant","fio","ashtml","email","note","devices","nrequest","user");
-$listAlias = array("Тема: ","","","","На: ","На: ","На: ","Инициатор: ","Инициатор: ","Представление html","Почта инициатора: ","","Необходимое оборудование: ",
-	"<br />Для просмотра заявки нажмите по ","Пользователь: "
+$listPos = array("theme","measure","description","message","date","time","datetime","applicant","fio","ashtml","devices","email","user","note","nrequest");
+$listAlias = array("Тема: ","","","","На: ","На: ","На: ","Инициатор: ","Инициатор: ","Представление html","Необходимое оборудование: ","Почта инициатора: ",
+	"Пользователь: ",
+	"",
+	"Для просмотра заявки нажмите по "
 );
 	
 
@@ -71,11 +74,15 @@ function defaultSort(&$list){
 			
 			if(in_array($key,$listPos)){
 				
-				if(($i = getPos($key)) || ($i === 0)){
-					$k = $i;
-					$newList[] = array("i"=>$i,"field"=>$key,"value"=>$value);
-				}else{
-					$ofprocess[] = array("i"=>$k,"field"=>$key,"value"=>$value);
+				if($value != ""){
+				
+					if(($i = getPos($key)) || ($i === 0)){
+						$k = $i;
+						$newList[] = array("i"=>$i,"field"=>$key,"value"=>$value);
+					}else{
+						$ofprocess[] = array("i"=>$k,"field"=>$key,"value"=>$value);
+					}
+					
 				}
 			}
 		}
@@ -109,6 +116,13 @@ if($resolution){
 	
 	try{
 		
+		
+		/* for availabla for use $dataRecord */
+		// include "$path../headerBase.php"; // ломает отправку сообщений.
+		// тексты сообщений не прогонять через encodeURIComponent,
+		// что бы не пришлось использовать это "подключение", иначе, почему то обрезается $dataRecord - на выходе только верстка об инифиаторе.
+		
+		
 		$dataRecord = false;
 		if(!isset($_POST['dataRecord'])){
 			
@@ -117,6 +131,7 @@ if($resolution){
 		
 		$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
 		$dataRecord = json_decode($dataRecord,true);
+		
 		
 		
 		/*
@@ -158,7 +173,7 @@ if($resolution){
 					
 				}
 				
-				$display .= $item["value"];
+				$display .= ($item["value"]);
 				
 				if($item["field"] == "note"){ 
 					$display .= ' */'; 
@@ -166,13 +181,13 @@ if($resolution){
 				
 				$display .= '</span>';
 				
-				if(($item["field"] != "nrequest") && ($item["field"] != "email")){
+				/* if(($item["field"] != "nrequest") && ($item["field"] != "email")){ */
 					$display .= '<br />';
-				}
+				/* } */
 				
 			}else{
 				
-				$display .= $item["value"];
+				$display .= ($item["value"]);
 			}
 		}
 	

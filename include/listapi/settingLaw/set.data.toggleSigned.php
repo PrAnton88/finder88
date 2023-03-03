@@ -74,7 +74,8 @@ try{
 			'adminConversation'=>(isset($dataRecord['adminConversation'])?$dataRecord['adminConversation']:0),
 			'dispatchConversation'=>(isset($dataRecord['dispatchConversation'])?$dataRecord['dispatchConversation']:0),
 			'dispatchToBroneDevice'=>(isset($dataRecord['dispatchToBroneDevice'])?$dataRecord['dispatchToBroneDevice']:0),
-			'adminSettingLaw'=>(isset($dataRecord['adminSettingLaw'])?$dataRecord['adminSettingLaw']:0)
+			'adminSettingLaw'=>(isset($dataRecord['adminSettingLaw'])?$dataRecord['adminSettingLaw']:0),
+			'editorCategories'=>(isset($dataRecord['editorCategories'])?$dataRecord['editorCategories']:0)
 		);
 		
 		

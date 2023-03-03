@@ -50,10 +50,9 @@ try{
 				
 			}
 			
-			
 		//}
 		/* просматривая чужой профиль не зачем устанавливать настройки */
-		$admin = false;
+		// $admin = false;
 	}
 	
 	// echo 'count user = '.count($user);
@@ -62,17 +61,20 @@ try{
 	if(!$userv){
 		// echo 'without userv';
 		
-		$pathAvatar = "/assets/images/avatars/";
+		/* выбор аватара */
+		require_once $path."/lib/getFiles.php";
+		$files = getFiles($modx,$db,$user['uid']);
 		
-		if($user["avatar"] != ""){
-			$avatar = $pathAvatar.$user["avatar"];
+		if(count($files) > 0){
+			$file = $files[0];
 		}else{
-			$avatar = $pathAvatar."avatar.png";
-			$smarty -> assign("avatarDefault",true);
+			$file = array('link'=>'/assets/images/avatars/avatar.png');
 		}
 		
-		$smarty -> assign("avatar",$avatar);
-		
+		// это для "$pathAppChunk/tmp.avatar.tpl"}
+		$smarty->assign("file", $file);
+
+
 		$mop = $user["mop"];
 		$uop = $user["uop"];
 		$pop = $user["pop"];
@@ -95,10 +97,17 @@ try{
 		$smarty -> assign("userv",$userv);
 	}
 	
+	$query = "SELECT ip FROM pc WHERE role=".$user["id"]." AND hidden=0";
+	$listip = $db->fetchAssoc($query,$uid);
+	if( is_string($listip) && (strpos($listip,"error") !== false)){
+		throw new ErrorException("SQL error");
+	}
+	$user["listip"] = $listip;
+	$smarty -> assign("isprofile",true);
+	
 	
 	$smarty -> assign("admin",$admin);
     $smarty -> assign("user",$user);
-	
 	
 	if(isset($_COOKIE['dbtype'])){
 		if($_COOKIE['dbtype'] == "prod"){

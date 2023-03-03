@@ -32,7 +32,8 @@ try{
 	if(isset($dataRecord['signed']) && ($dataRecord['signed'] == true)){
 		/* просто отписываем - удаляем запись из таблицы frontend */
 		
-		$query = 'DELETE FROM frontend WHERE id = '.$dataRecord['id'];
+		// $query = 'DELETE FROM frontend WHERE id = '.$dataRecord['role'];
+		$query = "Update send_options set SendON_1 = 2, SendON_2 = 1 where send_options.User_id = ".$dataRecord['role'];
 		$signeding = $db->query($query,$uid);
 		
 		if(is_string($signeding) && (strpos($signeding,'error')!== false)){
@@ -44,7 +45,9 @@ try{
 	}else{
 		/* пользователь не был подписан, подписываем его - вносим в таблицу frontend */
 		
-		$respInsert = $db->insert("frontend", array('id'=>$dataRecord['id']), array());
+		// $respInsert = $db->insert("frontend", array('id'=>$dataRecord['role']), array());
+		$query = "Update send_options set SendON_1 = 1, SendON_2 = 2 where send_options.User_id = ".$dataRecord['role'];
+		$respInsert = $db->query($query,$uid);
 		
 		if(is_string($respInsert) && (strpos($respInsert,'error')!== false)){
 			throw new ErrorException('SQL Error');

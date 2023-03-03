@@ -27,13 +27,13 @@ try{
 		
 	include 'config.php';
 	
-	$query = "SELECT  r.id,r.pagetitle as name,r.class_key,r.parent,r.publishedon,r.content FROM modx_site_content as r";
+	$query = "SELECT  r.id,r.pagetitle as name,r.class_key,r.parent,r.createdon,r.content FROM modx_site_content as r";
 	
 	
 	
-	$query .= " WHERE parent=$idNews AND publishedby<>0 AND deleted=0 AND publishedon > ".$dataRecord['left']." AND publishedon < ".$dataRecord['right'];
+	$query .= " WHERE parent=$idNews AND publishedby<>0 AND deleted=0 AND createdon > ".$dataRecord['left']." AND createdon < ".$dataRecord['right'];
 	
-	$query .= " ORDER BY publishedon DESC";
+	$query .= " ORDER BY createdon DESC";
 	
 	
 	$result = $db->fetchAssoc($query,$uid);

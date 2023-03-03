@@ -208,12 +208,10 @@ if($resolution){
 			
 			
 			$dataRecord = false;
-			if(isset($_POST['dataRecord'])){
-				$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
-				
-				
-				
-				$dataRecord = json_decode($dataRecord,true);
+			require_once "../headerBase.php";
+			
+			//$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
+			//$dataRecord = json_decode($dataRecord,true);
 				
 				
 				/* необходимо узнать не пересекается ли запись с датой и временем из уже имеющихся записей */
@@ -451,12 +449,6 @@ $query = "UPDATE conversationcompleted set time='$time', note='".str_replace('\'
 				echo $display;
 			
 				header("HTTP/1.1 200 Ok");
-				
-			}else{
-				
-				throw new ErrorException("request data is invalid. record for new data is not found ");
-			}
-			
 			
 			
 		}
