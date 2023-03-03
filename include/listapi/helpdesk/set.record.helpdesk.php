@@ -44,41 +44,32 @@ try{
 		}
 	}
 	
-	
-	if(!$resolution){
-		header("HTTP/1.1 403 Forbidden");
-		exit;
-	}
-	
-	if(!isset($_POST['dataRecord'])){
-		throw new ErrorException("Нет данных для записи");
-	}
-	
 	$dataOutput = array();
 	$id = $user["uid"];
-	
 	$description = 'Получено сообщение. ';
 	
-	$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
-	$dataRecord = json_decode($dataRecord,true);
-	
+	include "$path../headerBase.php";
+	/* availabla for use $dataRecord */
+
 	$title = false;
 	if(isset($dataRecord['title'])){
-		$title = str_replace('\'','"',$dataRecord['title']);
-		$title = str_replace("\\","/",$title);
+		$title = $dataRecord['title'];
 	}
 	
 	$body = false;
 	if(isset($dataRecord['body'])){
-		$body = str_replace('\'','"',$dataRecord['body']);
-		$body = str_replace("\\","/",$body);
+		$body = $dataRecord['body'];
 	}
 	
 	$comment = false;
 	if(isset($dataRecord['comment'])){
-		$comment = str_replace('\'','"',$dataRecord['comment']);
-		$comment = str_replace("\\","/",$comment);
+		$comment = $dataRecord['comment'];
 	}
+	
+	if((!$comment) && (!$title)){
+		throw new ErrorException("arg title is not found");
+	}
+	
 	$hidden = false;
 	if(isset($dataRecord['hidden'])){
 		$hidden = $dataRecord['hidden'];
