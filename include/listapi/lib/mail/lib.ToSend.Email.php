@@ -86,7 +86,7 @@ width:100%;
 padding:1%; 
 font-size:12px;
 display:block; ">'
-.iconv('UTF-8','Windows-1251','<font> © ООО ФПК «Космос-Нефть-Газ» '.date("Y").'</font>').
+.iconv('UTF-8','Windows-1251//IGNORE','<font> © ООО ФПК «Космос-Нефть-Газ» '.date("Y").'</font>').
 '</div>
 </body></html>';
 			
@@ -133,16 +133,35 @@ display:block; ">'
           )
         );
         
-        $context = stream_context_create($opts);
-        
-        // Open the file using the HTTP headers set above
-        $file = file_get_contents(
-           'http://192.168.7.254/xmpp/send.Test.php',
-            false, 
-            $context
-        );
-        
-        return $file;
+		
+		try{
+			
+			$context = stream_context_create($opts);
+			
+			// Open the file using the HTTP headers set above
+			// throw new Exception('test Error');
+			
+			$stream = fopen( /* instead file_get_contents */
+			   'http://192.168.7.254:86/xmpp/send.Test.php',
+			   'r',
+				false, 
+				$context
+			);
+			
+			// информация о заголовках, а также
+			// метаданные о потоке
+			// echo Debug::d(stream_get_meta_data($stream),'stream_get_meta_data($stream)');
+
+			// актуальная информация по ссылке $url
+			// echo Debug::d(stream_get_contents($stream),'stream_get_contents($stream)');
+			// fclose($stream);
+			
+		}catch(Exception $ex){
+			
+			$stream = $ex->getMessage();
+		}finally{
+			return $stream;
+		}
     }
 	
 	/* за код в convretDataSendOptio и routeBacket меня не ругать */
@@ -233,21 +252,51 @@ display:block; ">'
 		return strip_tags($str, "<a>");
 	}
 	
-	function replaceLink(&$str,$taglink = "<a href='mailto:"){
+	function replaceLink(&$str,$taglink = '<a href="mailto:'){
 		
 		$posStartLinkEmail = null;
+		$LinkEmail = false;
+		
+		//throw new ErrorException($str);
+		
 		if(($posStartLinkEmail = strpos($str,$taglink)) && ($posStartLinkEmail !== false)){
 			
-			
+			//throw new ErrorException(strpos($str,'">')+2);
 			//$str = str_replace("<a href='mailto:","",$str);
 			
-			$LinkEmail = substr($str, $posStartLinkEmail, (strpos($str,"'>")+2-$posStartLinkEmail));
+			//$LinkEmail = substr($str, $posStartLinkEmail, (strpos($str,'">')+2-$posStartLinkEmail));
+			//$LinkEmail = substr($str, $posStartLinkEmail, (strpos($str,'">')+2));
+			$LinkEmail = substr($str, $posStartLinkEmail);
 			
-			$str = str_replace($LinkEmail,"",$str);
-			$str = str_replace("</a>","",$str);
 			
+			$LinkEmail = substr($LinkEmail,0,(strpos($LinkEmail,'</a>')+4));
+			
+			if(strpos($LinkEmail,'http') === false){
+				$completeLink = substr($LinkEmail,strlen($taglink),strpos($LinkEmail,'">')-strlen($taglink));
+			}else{
+				$completeLink = substr($LinkEmail,strlen($taglink)-strlen('http://'),strpos($LinkEmail,'">')-strlen($taglink)+strlen('http://'));
+			}
+			
+			
+			// throw new ErrorException($completeLink);
+			
+			// $LinkEmail = substr($str,(count($LinkEmail) + (strpos($str,'<')+1)));
+			
+			$str = str_replace($LinkEmail,$completeLink,$str);
+			
+			// $LinkEmail = substr($LinkEmail, $posStartLinkEmail, );
+			
+			
+			// $str = str_replace("</a>","",$str);
+			
+			return array('str'=>$str,'tag'=>$completeLink);
 		}
-		return array('str'=>$str,'tag'=>$LinkEmail);
+		
+		/* if(!$LinkEmail){
+			throw new Exception($taglink."  >>>  ".$str);
+		} */
+		// return array('str'=>$str,'tag'=>$LinkEmail);
+		return false;
 	}
 	
 	function replaceHtmlChars2($str){
@@ -260,37 +309,61 @@ display:block; ">'
 		$str = str_replace("<br />","\n",$str);
 		$str = str_replace("<br/>","\n",$str);
 		
-		/* strip_tags($str, "<a>"); */
 		
 		$replacer = replaceLink($str);
-		$str = $replacer['str'];
-		
-		$replacer = replaceLink($str, "<a href='http:");
-		$str = $replacer['str'];
-		
-		
-		if(($posStartLinkEmail = strpos($replacer['tag'],'http://')) && ($posStartLinkEmail !== false)){
+		if($replacer){
 			
-			$replacer = replaceLink($replacer['tag'], 'http://'); 
 			
-			$str .= ' '.$replacer['tag'];
-			$str = str_replace("'>","",$str);
+			// throw new ErrorException($str);
 			
+			$str = $replacer['str'];
+			
+			
+			
+			
+			
+			$replacer = replaceLink($str, '<a href="http://');
+			if($replacer){
+				
+				// $str .= ' '.$replacer['tag'];
+				$str = $replacer['str'];
+			
+				if(($posStartLinkEmail = strpos($replacer['tag'],'http://')) && ($posStartLinkEmail !== false)){
+					
+					$replacer = replaceLink($replacer['tag'], 'http://'); 
+					
+				}
+				
+			}
+		}else{
+			$str = '';
 		}
 		
+		
+		
+		
+		
+		
 		$str = str_replace(array("normalText","italicBoldNote","forNotes","importantString"),"",$str);
-		$str = str_replace('href="http://info:86/index.php?id=158"','',$str);
+		$str = str_replace('href="http://'.$_SERVER['HTTP_HOST'].'/index.php?id=158"','',$str);
+		
+		$str = str_replace("подписанного на оповещения", 'подписанного на оповещения http://'.$_SERVER['HTTP_HOST'].'/index.php?id=158',$str);
+		// $str = str_replace('href="http://'.$_SERVER['HTTP_HOST'].':'.$_SERVER['REMOTE_PORT'].'/index.php?id=158"','',$str);
 		$str = str_replace('<a class="" >','',$str);
 		$str = str_replace('<span class="">','',$str);
+		$str = str_replace('<span class="','',$str);
 		$str = str_replace("</span>","",$str);
 		
+		$str = str_replace("<text>","",$str);
+		$str = str_replace("</text>","",$str);
 		
 		$str = str_replace('<div style="border: 2px solid #b38c16; width: 120px; display: block; margin:10px 30px; background-color: white; color: #b38c16;" >','',$str);
 		$str = str_replace('<div style="border: 2px solid #dc3545; width: 120px; display: block; margin:10px 30px; background-color: white; color: #dc3545;" >','',$str);
 		$str = str_replace('<div style="border: 2px solid gray; width: 120px; display: block; margin:10px 30px; background-color: white; color: gray;" >','',$str);
 
 		$str = str_replace('</div>',"\r\n",$str);
-		
+		$str = str_replace("</a>","",$str);
+		$str = str_replace("/*","\r\n/*",$str);
 		
 		return $str;
 	}
@@ -304,16 +377,26 @@ display:block; ">'
 		/*3 - оповещени¤ об изменениях к заявке*/
 		
 		$log=fopen($_SERVER['DOCUMENT_ROOT']."/custom/logs/anyEvent.txt","a+");
+		$stream=false;
 		try{
 			
+			$email = false;
+			if(isset($mailt['email']) && ($mailt['email'] != '')){
+				$email = $mailt['email'];
+				$email = str_replace("\n","",str_replace("\n\r","",str_replace(" ","",$email)));
+				
+				fwrite($log, date("d-m-Y H:i:s")."\r\n-\tnew message to {$email}\r\n");
+			}
 			
-			if(!isset($mailt['email'])){ throw new Exception('arg email is not found'); }
-			$email = str_replace("\n","",str_replace("\n\r","",str_replace(" ","",$mailt['email'])));
+			if($email === false){
+				// throw new Exception('arg email is not found'); 
+				fwrite($log, date("d-m-Y H:i:s")."\r\n-\t arg email is not found \r\n");
+			}
 			
-			
-			fwrite($log, date("d-m-Y H:i:s")."\r\n-\tnew message to {$email}\r\n");
-			fwrite($log, "-\t".$sendmess."\r\n");
-			
+			fwrite($log, "-\t".$sendmess."\r\n\r\n");
+			if($email === false){
+				return true;
+			}
 			/*
 			if(isset($mailt['uid']) && ($mailt['uid'] == $user['uid'])){
 				// fwrite($log, "\tthis send message for self\r\n\r\n");
@@ -335,14 +418,24 @@ display:block; ">'
 			
 			$subject = iconv("utf-8","cp1251//IGNORE",$subject);
 			
+			
+			
+			$sendmess = str_replace("amp;","&",$sendmess);
 			$sendmess = iconv("utf-8","windows-1251",$sendmess);
+			
+			$opts['subMail'] = 0;
+			$opts['subCom'] = 1;
 			
 			if($opts['subMail']==1){
 				
 				fwrite($log, $subject." - Send to Mail....");
 				
 				if(!sendEmail($email,$subject,$sendmess)){
-					throw new Exception(" send to email is invalid ");
+					if($opts['subCom']!=1){
+						throw new Exception(" send to email is invalid ");
+					}else{
+						fwrite($log, "send to email is invalid\r\n");
+					}
 				}
 				
 				fwrite($log, "complete\r\n");
@@ -364,24 +457,49 @@ display:block; ">'
 				
 				fwrite($log, "- Send to Spark....");
 				
-				if(!sendMessAsXmpp($mailt["login"],$sendCom)){
-					throw new Exception("is invalid ");
+				$i = 0;
+				while(($i < 5) && (($stream === false) || is_string($stream) || ($stream == null))){
+					$stream = sendMessAsXmpp($mailt["login"],$sendCom);
+					
+					if(($stream !== false) && (!is_string($stream)) && ($stream != null)){
+						break; /* просто что бы не увеличивать счётчик если произошло это в последней из пяти итераций */
+					}
+					
+					$i++;
 				}
 				
-				fwrite($log, "complete\r\n");
+				if($i == 5){
+					/* если при последней инетации увеличение счетчика произошло, значит "stream is invalid " */
+					
+					if(is_string($stream)){
+						fwrite($log, "$stream\r\n");
+					}
+					throw new Exception("stream is invalid ");	
+				}
+				
+				
+				if(($stream !== false) && (!is_string($stream))){
+					fwrite($log, "complete\r\n");
+				}
 			}
-			
-			
 			
 			fwrite($log, "\r\n\r\n");
 			return true;
 			
 		}catch(Exception $ex){
+		
+			$ex = exc_handler($ex);
+			/* $ex = iconv("utf-8","windows-1251//IGNORE",$ex); */
 			
-			fwrite($log, "-\tException: ".$ex->getMessage()."\r\n\r\n");
+			fwrite($log, "-\tException: ".$ex."\r\n\r\n");
 			
 		}finally{
 			fclose($log);
+			if(($stream !== false) && (!is_string($stream))){
+				if($stream != null){
+					fclose($stream);
+				}
+			}
 		}
 		
 	}
