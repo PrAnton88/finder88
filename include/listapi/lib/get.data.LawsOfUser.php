@@ -11,7 +11,21 @@ header('Content-type:application/json');
 try{
 
 	$admin = ($user['priority'] == 3);
-	if(!$admin){ $resolution = false; }
+	//if(!$admin){ $resolution = false; }
+	
+	$query = getQueryUserLaws($db);
+	/* проверим права текущего авторизованного. Если он не исеет право на настройку ролей - то Запрещено */
+	if(!$admin){
+		$usersLaws = $db->fetchFirst($query." WHERE u.role = ".$user['id'],$uid);
+		if(is_string($usersLaws) && (strpos($usersLaws,'error')!== false)){
+			throw new ErrorException('SQL Error ');
+		}
+		
+		if($usersLaws['adminSettingLaw'] != 1){
+			$resolution = false;
+		}
+	}
+	
 
 	if(!$resolution){
 		header("HTTP/1.1 403 Forbidden"); exit;
@@ -24,10 +38,10 @@ try{
 	}
 	
 	/* 1. Список всех сотрудников ОТО */
-	$listOtoUsers=$db->fetchAssoc($queryUserData.' AND p.dept = 75 AND r.priority=3',$uid);
+	/*$listOtoUsers=$db->fetchAssoc($queryUserData.' AND p.dept = 75 AND r.priority=3',$uid);
 	if(is_string($listOtoUsers) && (strpos($listOtoUsers,'error')!== false)){
 		throw new ErrorException('SQL Error');
-	}
+	}*/
 	
 	
 	
@@ -49,11 +63,14 @@ try{
 	$query = getQueryToGetUserLaws($listLaw);
 	*/
 	
-	$query = getQueryUserLaws($db);
+	
 	
 	/*
 	$query = "SELECT $listLaw, u.id, concat_ws(' ', u.last_name, u.first_name, u.patronymic) 'fio', u.post 'prof' FROM law as l LEFT JOIN users as u ON u.role = l.uid";
 	*/
+	
+	
+	
 	
 	if($dataRecord && (isset($dataRecord['uid']))){
 		
@@ -65,11 +82,7 @@ try{
 		throw new ErrorException('SQL Error ');
 	}
 	
-
-	
 	echo '{"success":1,"data":'.json_encode($usersLaws).'}';
-	
-	
 	
 	
 }catch(ErrorException $ex){
