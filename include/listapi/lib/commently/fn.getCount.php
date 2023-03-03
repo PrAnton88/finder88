@@ -67,7 +67,7 @@ class oCommentsHand
 		
 		$lastComment = "";
 		
-		$queryComment = "SELECT c.id, c.text, c.user_link, c.hidden, concat_ws(' ', u.last_name, u.first_name) 'fi' FROM comments as c LEFT JOIN users as u ON u.id = c.user_link WHERE (c.parent=0 OR (c.parent IS NULL)) AND c.request = $nRecord ";
+		$queryComment = "SELECT c.id, c.text, c.user_link, c.hidden, concat_ws(' ', u.last_name, u.first_name) 'fi' FROM comments as c LEFT JOIN users as u ON u.role = c.user_link WHERE (c.parent=0 OR (c.parent IS NULL)) AND c.request = $nRecord ";
 			
 		if($admin){
 			$queryComment .= " AND c.hidden < 2 ";
@@ -82,7 +82,7 @@ class oCommentsHand
 		
 		foreach($comments as $item){
 			
-			$lastComment = $item['fi'].': '.$item['text'];
+			$lastComment = $item['fi'].': '.str_replace("\n","",str_replace("\r\n","",$item['text']));
 		}
 		
 		return $lastComment;
