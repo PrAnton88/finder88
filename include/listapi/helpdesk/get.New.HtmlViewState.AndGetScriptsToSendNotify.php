@@ -110,7 +110,27 @@ try{
 	
 	$display .= '<script>(function(){thrower(function(){';
 	/* $display .= 'let dataMessage = {};'; */
-	$display .= 'let completeSend = function (mess){ message.print(mess?mess:"Сообщение отправлено"); };';
+	$display .= 'let progressSendly = new oProgress("notify about Change State"); progressSendly.begin();';
+	$display .= 'let itemSetNotifyEvent = function(){
+		if(listNotifyEvent.length > 0){
+			let item = listNotifyEvent.shift();
+			oTimeExecuter.push(function(){
+				item('.$nrequest.');
+			});
+		}
+		if(oTimeExecuter.isEmpty()){
+			progressSendly.end();
+		}
+	};';
+	$display .= 'let listNotifyEvent = [];';
+	$display .= 'let completeSend = function (mess){ 
+		if(mess){
+			message.print(mess); 
+		}
+		
+		itemSetNotifyEvent();
+		
+	};';
 	$display .= 'let oSender = oBaseAPI.message.email;';
 	
 	/* $display .= 'dataMessage.nrequest = '.$nrequest.';';
@@ -160,20 +180,19 @@ try{
 			$listPrior = ["Низкий","Средний","Высокий"];
 			/* то отовещаем Ответственного об изменении приоритета заявки */
 		
-			$display .= '(function(nrequest){';
-			$display .= 'let dataMessage = {};';
-			$display .= 'dataMessage.nrequest = nrequest;';
-			/* $display .= 'dataMessage.subject = "Change priority on ticket for you";'; */
-			$display .= 'dataMessage.subject = "Новый приоритет заявки";';
-			/* $display .= 'dataMessage.measure = "Изменен приоритет!";'; */
-			$display .= 'let note = "Оповещение ответственному";';
-			$display .= 'dataMessage.description = "'.$existmess["assdShort"].', для заявки '.$commonMessage.'Новый приоритет - '.$listPrior[$existmess['prior']].'";';
-			$display .= 'oSender.sendToAssdTickets(dataMessage,function(){ completeSend(note); });';
-			$display .= '})('.$nrequest.');';
-			
-			
-			
-			$display .= '});})();';
+			$display .= 'listNotifyEvent.push(
+				(function(nrequest){
+					let dataMessage = {};
+					dataMessage.nrequest = nrequest;
+					dataMessage.subject = "Новый приоритет заявки";
+					let note = "Оповещение ответственному";
+					dataMessage.description = "'.$existmess["assdShort"].', для заявки '.$commonMessage.'Новый приоритет - '.$listPrior[$existmess['prior']].'";
+					oSender.sendToAssdTickets(dataMessage,function(){ completeSend(note); });
+				})
+			);';
+			$display .= '
+				itemSetNotifyEvent();
+			});})();';
 			$display .= '</script>';
 			
 			echo $display;
@@ -205,31 +224,34 @@ try{
 			
 			if((int)$existmess["assd"] != 0){
 				/* неважно то какой был ответственный - но если сейчас 0, то уже нет ответственно */
-				
-				$display .= '(function(nrequest){';
-				$display .= 'let dataMessage = {};';
-				$display .= 'dataMessage.nrequest = nrequest;';
-				if($nassd != 0){
+				if((int)$existmess["applicant"] != 0){
 					
-					/* 1. отменен предыдущий ответственный и назначен новый */
-					/* $display .= 'dataMessage.subject = "Change in your ticket";';*/
-					$display .= 'dataMessage.subject = "Изменения в заявке";';
-					$display .= 'dataMessage.measure = "Изменен ответственный на вашу заявку";';
-					$display .= 'let note = "('.$passAssd["fi"].' больше не ответственный)";';
-					$display .= 'dataMessage.description = "На вашу заявку '.$commonMessage.'Назначен ДРУГОЙ ответственный - '.$existmess["assdShort"].'";';
-					
-				}else{
-					/* 1. - назначен ответственный на заявку */
-					/* $display .= 'dataMessage.subject = "Your ticket is in progress";'; */
-					$display .= 'dataMessage.subject = "Ваша заявка принята";';
-					$display .= 'dataMessage.measure = "Ваша заявка принята!";';
-					$display .= 'let note = "сообщение заявителю";';
-					$display .= 'dataMessage.description = "'.$existmess["assdShort"].' назначен ответственным на вашу заявку '.$commonMessage.'";';
+					$display .= 'listNotifyEvent.push(
+						(function(nrequest){
+						let dataMessage = {};
+						dataMessage.nrequest = nrequest;';
+					if($nassd != 0){
+						
+						/* 1. отменен предыдущий ответственный и назначен новый */
+						/* $display .= 'dataMessage.subject = "Change in your ticket";';*/
+						$display .= 'dataMessage.subject = "Изменения в заявке";
+							dataMessage.measure = "Изменен ответственный на вашу заявку";
+							let note = "('.$passAssd["fi"].' больше не ответственный)";
+							dataMessage.description = "На вашу заявку '.$commonMessage.'Назначен ДРУГОЙ ответственный - '.$existmess["assdShort"].'";';
+						
+					}else{
+						/* 1. - назначен ответственный на заявку */
+						/* $display .= 'dataMessage.subject = "Your ticket is in progress";'; */
+						$display .= 'dataMessage.subject = "Ваша заявка принята";
+									dataMessage.measure = "Ваша заявка принята!";
+									let note = "сообщение заявителю";
+									dataMessage.description = "'.$existmess["assdShort"].' назначен ответственным на вашу заявку '.$commonMessage.'";';
+					}
+					$display .= 'oSender.sendToApplicantTickets(dataMessage,function(){ completeSend(false); });
+					}));';
 				}
-				$display .= 'oSender.sendToApplicantTickets(dataMessage,function(){ completeSend(note); });';
-				$display .= '})('.$nrequest.');';
-				
 				/* 2. */
+				$display .= 'listNotifyEvent.push(';
 				$display .= '(function(nrequest){';
 				$display .= 'let dataMessage = {};';
 				$display .= 'dataMessage.nrequest = nrequest;';
@@ -239,21 +261,24 @@ try{
 				$display .= 'let note = "Оповещение ответственному";';
 				$display .= 'dataMessage.description = "'.$existmess["assdShort"].', Вам назначена заявка '.$commonMessage.'";';
 				$display .= 'oSender.sendToAssdTickets(dataMessage,function(){ completeSend(note); });';
-				$display .= '})('.$nrequest.');';
+				$display .= '})';
+				$display .= ');';
 				
 				/* 3. оповещение предыдущему ответственному */
 				if($passAssd){
+					$display .= 'listNotifyEvent.push(';
 					$display .= '(function(nrequest){';
 					$display .= 'let dataMessage = {};';
 					$display .= 'dataMessage.nrequest = nrequest;';
 					/* $display .= 'dataMessage.subject = "Exempt from doing";'; */
-					$display .= 'dataMessage.subject = "Вы освобождены от выполнения заявки ";';
-					/* $display .= 'dataMessage.measure = "Вы освобождены от выполнения заявки ";'; */
+					$display .= 'dataMessage.subject = "О переназначении заявки ";';
+					/* $display .= 'dataMessage.measure = "О переназначении заявки ";'; */
 					/* $display .= 'dataMessage.note = "Оповещение предыдущему ответственному";'; */
 					$display .= 'let note = "Оповещение предыдущему ответственному";';
 					$display .= 'dataMessage.description = "'.$passAssd["fi"].', выполнение заявки '.$commonMessage.'переназначено другому ответственному";';
 					$display .= 'oSender.sendToAnyUser(dataMessage,[{email:"'.$passAssd["email"].'",login:"'.$passAssd["login"].'",role:"'.$passAssd["role"].'"}],function(){ completeSend(note); });';
-					$display .= '})('.$nrequest.');';
+					$display .= '})';
+					$display .= ');';
 				}
 				
 				
@@ -274,15 +299,19 @@ try{
 			$display .= 'message.print("Заявка выполнена");';
 			/* закрыли заявку - установили статус Выполнена */
 			/* 1. заявителю */
-			$display .= '(function(nrequest){';
-			$display .= 'let dataMessage = {};';
-			$display .= 'dataMessage.nrequest = nrequest;';
-			/* $display .= 'dataMessage.subject = "Your ticket has been completed";'; */
-			$display .= 'dataMessage.subject = "Ваша заявка выполнена";';
-			$display .= 'let note = "Оповещение заявителю";';
-			$display .= 'dataMessage.description = "Ваша заявка '.$commonMessage.' ВЫПОЛНЕНА";';
-			$display .= 'oSender.sendToApplicantTickets(dataMessage,function(){ completeSend(note); });';
-			$display .= '})('.$nrequest.');';
+			if((int)$existmess["applicant"] != 0){
+				$display .= 'listNotifyEvent.push(';
+				$display .= '(function(nrequest){';
+				$display .= 'let dataMessage = {};';
+				$display .= 'dataMessage.nrequest = nrequest;';
+				/* $display .= 'dataMessage.subject = "Your ticket has been completed";'; */
+				$display .= 'dataMessage.subject = "Ваша заявка выполнена";';
+				$display .= 'let note = "Оповещение заявителю";';
+				$display .= 'dataMessage.description = "Ваша заявка '.$commonMessage.' ВЫПОЛНЕНА";';
+				$display .= 'oSender.sendToApplicantTickets(dataMessage,function(){ completeSend(false);  });';
+				$display .= '})';
+				$display .= ');';
+			}
 		}else{
 			
 			/* оповещения */
@@ -292,18 +321,22 @@ try{
 			if($existmess["assd"] != ''){
 				
 				/* 1. заявителю */
-				$display .= '(function(nrequest){';
-				$display .= 'let dataMessage = {};';
-				$display .= 'dataMessage.nrequest = nrequest;';
-				/* $display .= 'dataMessage.subject = "Your ticket is in progress";'; */
-				$display .= 'dataMessage.subject = "Ваша заявка принята";';
-				$display .= 'dataMessage.measure = "Ваша заявка принята";';
-				$display .= 'let note = "Оповещение заявителю";';
-				$display .= 'dataMessage.description = "На вашу заявку '.$commonMessage.'назначен ответственным '.$existmess["assdShort"].'";';
-				$display .= 'oSender.sendToApplicantTickets(dataMessage,function(){ completeSend(note); });';
-				$display .= '})('.$nrequest.');';
-				
+				if((int)$existmess["applicant"] != 0){
+					$display .= 'listNotifyEvent.push(';
+					$display .= '(function(nrequest){';
+					$display .= 'let dataMessage = {};';
+					$display .= 'dataMessage.nrequest = nrequest;';
+					/* $display .= 'dataMessage.subject = "Your ticket is in progress";'; */
+					$display .= 'dataMessage.subject = "Ваша заявка принята";';
+					$display .= 'dataMessage.measure = "Ваша заявка принята";';
+					$display .= 'let note = "Оповещение заявителю";';
+					$display .= 'dataMessage.description = "На вашу заявку '.$commonMessage.'назначен ответственным '.$existmess["assdShort"].'";';
+					$display .= 'oSender.sendToApplicantTickets(dataMessage,function(){ completeSend(false); });';
+					$display .= '})';
+					$display .= ');';
+				}
 				/* 2. ответственному */
+				$display .= 'listNotifyEvent.push(';
 				$display .= '(function(nrequest){';
 				$display .= 'let dataMessage = {};';
 				$display .= 'dataMessage.nrequest = nrequest;';
@@ -313,37 +346,42 @@ try{
 				$display .= 'let note = "Оповещение ответственному";';
 				$display .= 'dataMessage.description = "'.$existmess["assdShort"].', Вам назначена заявка '.$commonMessage.'";';
 				$display .= 'oSender.sendToAssdTickets(dataMessage,function(){ completeSend(note); });';
-				$display .= '})('.$nrequest.');';
+				$display .= '})';
+				$display .= ');';
 			}elseif($passAssd){
 				/* $passAssd скорее всего есть, потому что  */
 				
 				
 				/* 1. заявителю */
-				$display .= '(function(nrequest){';
-				$display .= 'let dataMessage = {};';
-				$display .= 'dataMessage.nrequest = nrequest;';
-				/* $display .= 'dataMessage.subject = "Change in your ticket";'; */
-				$display .= 'dataMessage.subject = "Изменения в заявке";';
-				$display .= 'dataMessage.measure = "Отменен ответственный";';
-				$display .= 'let note = "Оповещение заявителю";';
-				$display .= 'dataMessage.description = "'.$passAssd["fi"].' больше не ответственный на вашу заявку '.$commonMessage.'";';
-				$display .= 'oSender.sendToApplicantTickets(dataMessage,function(){ completeSend(note); });';
-				$display .= '})('.$nrequest.');';
-				
+				if((int)$existmess["applicant"] != 0){
+					$display .= 'listNotifyEvent.push(';
+					$display .= '(function(nrequest){';
+					$display .= 'let dataMessage = {};';
+					$display .= 'dataMessage.nrequest = nrequest;';
+					/* $display .= 'dataMessage.subject = "Change in your ticket";'; */
+					$display .= 'dataMessage.subject = "Изменения в заявке";';
+					$display .= 'dataMessage.measure = "Отменен ответственный";';
+					$display .= 'let note = "Оповещение заявителю";';
+					$display .= 'dataMessage.description = "'.$passAssd["fi"].' больше не ответственный на вашу заявку '.$commonMessage.'";';
+					$display .= 'oSender.sendToApplicantTickets(dataMessage,function(){ completeSend(false); });';
+					$display .= '})';
+					$display .= ');';
+				}
 				
 				/* 2. бывшему ответственному */
+				$display .= 'listNotifyEvent.push(';
 				$display .= '(function(nrequest){';
 				$display .= 'let dataMessage = {};';
 				$display .= 'dataMessage.nrequest = nrequest;';
 				/* $display .= 'dataMessage.subject = "Exempt from doing";'; */
-				$display .= 'dataMessage.subject = "Вы освобождены от выполнения заявки ";';
-				/* $display .= 'dataMessage.measure = "Вы освобождены от выполнения заявки ";'; */
+				$display .= 'dataMessage.subject = "О переназначении заявки ";';
+				/* $display .= 'dataMessage.measure = "О переназначении заявки ";'; */
 				/* $display .= 'dataMessage.note = "Оповещение предыдущему ответственному";'; */
 				$display .= 'let note = "Оповещение предыдущему ответственному";';
 				$display .= 'dataMessage.description = "'.$passAssd["fi"].', отменено выполнение заявки '.$commonMessage.' ";';
 				$display .= 'oSender.sendToAnyUser(dataMessage,[{email:"'.$passAssd["email"].'",login:"'.$passAssd["login"].'",role:"'.$passAssd["role"].'"}],function(){ completeSend(note); });';
-				$display .= '})('.$nrequest.');';
-				
+				$display .= '})';
+				$display .= ');';
 			}else{
 				/* 1. изменен статус и статус не Выполнена; 2. нет ответственый на заявку; 3. и раньше ответственного на заявку не было */
 				/* поэтому это невозможная ветка */
@@ -352,7 +390,9 @@ try{
 		}
 	}
 	
-	$display .= '});})();';
+	$display .= '
+		itemSetNotifyEvent();
+	});})();';
 	$display .= '</script>';
 	
 	echo $display;
