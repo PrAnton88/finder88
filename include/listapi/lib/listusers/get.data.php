@@ -67,9 +67,15 @@ try{
 	
 	$query = $queryUserData;
 	
+	$isEmptyData = false;
 	if(isset($dataRecord["ndept"])){
 		$tmp = (int) $dataRecord["ndept"];
-		$query .= " AND p.dept=".$tmp;
+		if($tmp > 0){
+			$query .= " AND p.dept=".$tmp;
+		}else if($tmp < 0){
+			
+			$isEmptyData = true;
+		}
 	}
 	
 	if(isset($dataRecord["ncomp"])){
