@@ -12,8 +12,10 @@ try{
 	$path = '../../';
 	require_once "$path../start.php";
 	
-	$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
-	$dataRecord = json_decode($dataRecord,true);
+	//$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
+	//$dataRecord = json_decode($dataRecord,true);
+
+	require_once "$path../headerBase.php";
 
 	if(!isset($dataRecord['nrequest'])){
 		throw new ErrorException('arg nrequest is not found');
@@ -29,10 +31,7 @@ try{
 	}
 	
 	$ncomment = (int) $dataRecord['ncomment'];
-	if($ncomment == 0){
-		throw new ErrorException('arg ncomment is empty');
-	}
-
+	
 
 	if(!isset($dataRecord['subject'])){
 		throw new ErrorException('arg subject is not found');

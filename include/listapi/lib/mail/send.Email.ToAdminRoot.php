@@ -12,8 +12,10 @@ try{
 	$path = '../../';
 	require_once "$path../start.php";
 	
-	$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
-	$dataRecord = json_decode($dataRecord,true);
+	//$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
+	//$dataRecord = json_decode($dataRecord,true);
+
+	require_once "$path../headerBase.php";
 
 	if(!isset($dataRecord['subject'])){
 		$subject = 'this subject кириллица';

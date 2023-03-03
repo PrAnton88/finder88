@@ -12,12 +12,21 @@ try{
 	$path = '../../';
 	require_once "$path../start.php";
 	
+	/*
 	if(!isset($_POST['dataRecord'])){
 		throw new ErrorException('dataRecord is not found');
 	}
 	
 	$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
 	$dataRecord = json_decode($dataRecord,true);
+	*/
+
+	require_once "$path../headerBase.php";
+	
+	// echo $str;
+	//print_r($dataRecord);
+	
+	// throw new ErrorException('test error');
 
 	if(!isset($dataRecord['law'])){
 		throw new ErrorException('dataRecord.law is not found');
@@ -89,14 +98,32 @@ try{
 		throw new ErrorException('Получатели не определены. count(dataListMail) = 0');
 	}
 	*/
+	
+	
+	/* $posStartLinkEmail = null;
+	$taglink = '<a href="mailto:';
+	if($posStartLinkEmail = strpos($message,$taglink)){
+		throw new ErrorException($posStartLinkEmail);
+	}else{
+		throw new ErrorException($taglink."  __>>>__  ".$message);
+	}
+	*/
+	
+	
 	foreach($dataListMail as $itemMail){
 		if(!isset($itemMail['email'])){
 			throw new ErrorException('data email of itemMail in not found');
 		}
 		
+		
+		
+		
+		
+		
 		/* if(!sendEmail($itemMail,$subject,$message)){ */
 		if(!sendMessage($db,$itemMail,$subject,false /*$n*/,$message/*,$sendCom=false*/)){
-			throw new ErrorException("Сообщение '$subject' не отправлено");
+			throw new ErrorException(iconv("utf-8","windows-1251","Сообщение '$subject' не отправлено"));
+			// throw new ErrorException(iconv("utf-8","windows-1251","Сообщение $message не отправлено"));
 		}
 	}
 

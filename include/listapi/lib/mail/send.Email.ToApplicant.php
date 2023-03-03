@@ -4,6 +4,18 @@ header('Content-type:application/json; charset=windows-1251');
 
 
 try{
+	
+	/* useExam
+	
+		let dataMessage = {message:'изменение в вашей заявке',subject:'изменение в заявке',nrequest:4745};
+		
+		oBaseAPI.message.email.sendToApplicantTickets(dataMessage,function(respJson){
+			
+			console.log(respJson);
+		});
+	*/
+	
+	
 	$dataListMail = array();
 	require_once "lib.ToSend.Email.php";
 	
@@ -12,8 +24,12 @@ try{
 	$path = '../../';
 	require_once "$path../start.php";
 	
-	$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
-	$dataRecord = json_decode($dataRecord,true);
+	//$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
+	//$dataRecord = json_decode($dataRecord,true);
+
+
+	require_once "$path../headerBase.php";
+
 
 	if(!isset($dataRecord['nrequest'])){
 		throw new ErrorException('arg nrequest is not found');
@@ -37,13 +53,13 @@ try{
 	$message = $dataRecord['message'];
 	
 
-	/* $HeadMessage = 'Здравствуйте!<br />Оповещаем вас как ответственного на заявку<br />'; */
+	/* $HeadMessage = 'Здравствуйте!<br />Оповещаем вас как заявителя на заявку<br />'; */
 	/*  $HeadMessage = '<span class="italicBoldNote">Ваша заявка принята!</span><br />'; */
 	// $sendmess = "<span class='normalText'>  Здравствуйте, ".$mailt['fio']."!</span><br /><span class='normalText'>".$dtstring['fdatestr']."г. в ".$dtstring['ftimestr']." к заявке №".$mess_id." </span><span class='importantString'>поступил новый комментарий</span><br /><br /><span class='italicBoldNote'>Для просмотра заявки пройдите, пожалуйста, <a href='http://info:86/index.php?id=29&tiket=".$mess_id."'>по этой ссылке</a></span>";
 	
 	// $message = $HeadMessage.$message;
 
-	/* нужно выбрать данные пользователя ответственного к заявке */
+	/* нужно выбрать данные заявителя заявки */
 	/* в массив $itemMail */
 	$queryApplicantOfTicket .= $nrequest;
 	$itemMail = $db->fetchFirst($queryApplicantOfTicket,$uid);
@@ -57,6 +73,16 @@ try{
 	if(count($itemMail) == 0){
 		throw new ErrorException('data of applicant is empty (than array is empty)');
 	}
+	
+	if($itemMail['ctype'] == 1){
+		
+		$display = iconv("utf-8","windows-1251","Cообщение заявителю не отправлено");
+		/* throw new ErrorException($display); */
+		
+		echo '{"success":1,"description":"'.$display.'","countMails":"0"}';
+		exit;
+	}
+	
 	
 	$dataListMail[] = $itemMail;
 
@@ -75,8 +101,8 @@ try{
 		throw new ErrorException("send.Email.ToApplicant: Message '$subject' to Applicant was not sent. see custom/logs/anyEvent.txt");
 	}
 	
-
-	echo '{"success":1,"countMails":"'.count($dataListMail).'"}';
+	$display = iconv("utf-8","windows-1251","Cообщение заявителю отправлено");
+	echo '{"success":1,"description":"'.$display.'","countMails":"'.count($dataListMail).'"}';
 
 }catch(ErrorException $ex){
 	/* - когда html

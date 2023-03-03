@@ -93,11 +93,10 @@
 	
   }
   
-  function adv_send()
-    {
+	function adv_send(){
 		
     	if(!$this -> check_fields()) return true;
-     
+    
     	$address = 'mail.cosmos.local'; // адрес smtp-сервера
     	$port    = 25;          // порт (стандартный smtp - 25)
    

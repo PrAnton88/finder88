@@ -12,8 +12,10 @@ try{
 	$path = '../../';
 	require_once "$path../start.php";
 	
-	$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
-	$dataRecord = json_decode($dataRecord,true);
+	//$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
+	//$dataRecord = json_decode($dataRecord,true);
+
+	require_once "$path../headerBase.php";
 
 	if(!isset($dataRecord['subject'])){
 		throw new ErrorException('arg subject is not found');
@@ -27,13 +29,13 @@ try{
 	$message = $dataRecord['message'];
 	
 	
-	$HeadMessage = '<span class="italicBoldNote">Поступила новая заявка</span><br /><span class="italicBoldNote">Оповещаем вас как </span><a class="importantString" href="http://info:86/index.php?id=158">подписанного на оповещения</a><span class="italicBoldNote">.</span><br />';
+	$HeadMessage = '<span class="italicBoldNote">Поступила новая заявка</span><br /><span class="italicBoldNote">Оповещаем вас как </span><a class="importantString" href="http://'.$_SERVER['SERVER_NAME'].'/index.php?id=158">подписанного на оповещения</a><span class="italicBoldNote">.</span><br />';
 	$message = $HeadMessage.$message;
 	
 
 	/* выбираем в массив $dataListMail подписаных на оповещения */
 	/* $queryAdminsCkeckeds < queryUserData.php < ../../../start.php */
-	$listAdminSigned = $db->fetchAssoc($queryAdminsCkeckeds,$uid);
+	$listAdminSigned = $db->fetchAssoc(/*$queryAdminsCkeckeds*/ $SechenuchQueryCheckedsON,$uid);
 	if(is_string($listAdminSigned) && (strpos('error',$listAdminSigned) !== false)){
 		throw new ErrorException("SQL Error when selecting emalis admins signed");
 	}
