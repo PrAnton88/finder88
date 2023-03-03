@@ -10,25 +10,14 @@ header('Content-type:application/json');
 	
 try{
 
-	
-	if(!$resolution){
-		header("HTTP/1.1 403 Forbidden"); exit;
-	}
-	
-	if(!isset($_POST['dataRecord'])){
-		throw new ErrorException("Нет данных для записи"); exit;
-	}
+	$dataRecord = false;
+	require_once "$path../headerBase.php";
 	
 	$dataOutput = array();
 	// $id = $user["uid"];
-	
-	$description = 'Получено сообщение. ';
-	
-	$dataRecord = html_entity_decode(htmlspecialchars($_POST['dataRecord']));
-	$dataRecord = json_decode($dataRecord,true);
-	
-	
+	$description =	'Получено сообщение. ';
 	$note = '';
+	
 	if(isset($dataRecord['note'])){
 		$note = str_replace('\'','"',$dataRecord['note']);
 		$note = str_replace("\\","/",$note);
@@ -45,6 +34,22 @@ try{
 
 	$datest = $dataRecord['datest'];
 	$dateend = $dataRecord['dateend'];
+	
+	/* вероятно диспетчер может забронировать или изменять запись на период граница которого ранее сегодняшнего дня */
+	if(($datest < date("Y-m-d")) || ($dateend < date("Y-m-d"))){
+		
+		$resolution = checkUserLaws('adminBroneDevice');
+		if(!$resolution){
+			$resolution = checkUserLaws('dispatchToBroneDevice');
+		}
+		
+		if(!$resolution){
+			// throw new ErrorException('test error');
+			
+			header("HTTP/1.1 403 Forbidden"); exit;
+		}
+	}
+	
 	$checkedDevicesTypes = $dataRecord['checkedDevicesTypes'];
 
 	$deviceName = '';
