@@ -85,6 +85,13 @@ class oCommentsHand
 			$lastComment = $item['fi'].': '.str_replace("\n","",str_replace("\r\n","",$item['text']));
 		}
 		
+		$temp = str_replace("\r\n", " <br />", $lastComment);
+		$temp = str_replace("\n", " <br />", $temp);
+		
+		$temp = htmlspecialchars(str_replace("/", "\\", $temp));
+		$lastComment = str_replace('"', '\"', $temp);
+		
+		
 		return $lastComment;
 	}
 
