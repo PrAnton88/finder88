@@ -16,8 +16,8 @@ try{
 	
 	
 	
-	$query = "SELECT publishedon as id,pagetitle as name,class_key,parent FROM modx_site_content ";
-	$query .= " WHERE parent=$idNews AND publishedby<>0 AND deleted=0 ORDER BY publishedon DESC";
+	$query = "SELECT createdon as id,pagetitle as name,class_key,parent FROM modx_site_content ";
+	$query .= " WHERE parent=$idNews AND publishedby<>0 AND deleted=0 ORDER BY createdon ASC";
 	
 	/*
 	$query = "SELECT id,pagetitle as name,class_key,parent,publishedon,publishedby,deleted FROM modx_site_content ";
