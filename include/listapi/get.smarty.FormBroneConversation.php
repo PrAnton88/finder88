@@ -58,9 +58,6 @@ try{
 
 	if($listDevices && $dataBusy && $dateApply){
 		
-		
-		
-		
 		$listDevices = json_decode($listDevices,true);
 		$dataBusy = json_decode($dataBusy,true);
 		
